@@ -1,35 +1,36 @@
-[
-  {
-    "id": "p001",
-    "category": "groceries",
-    "name_en": "Premium Basmati Rice 5kg",
-    "name_bn": "প্রিমিয়াম বাসমতি চাল ৫ কেজি",
-    "price": 850,
-    "oldPrice": 950,
-    "rating": 4.5,
-    "reviews": 234,
-    "discount": 11,
-    "stock": 45,
-    "delivery": "1-2 days",
-    "image": "/uploads/rice.png",
-    "description_en": "Quality checked product. 7 days return (demo).",
-    "description_bn": "কোয়ালিটি চেকড পণ্য। ৭ দিনের রিটার্ন (ডেমো)।"
-  },
-  {
-    "id": "p002",
-    "category": "electronics",
-    "name_en": "Wireless Earbuds",
-    "name_bn": "ওয়্যারলেস ইয়ারবাডস",
-    "price": 2499,
-    "oldPrice": 3499,
-    "rating": 4.7,
-    "reviews": 891,
-    "discount": 29,
-    "stock": 0,
-    "delivery": "1-2 days",
-    "image": "/uploads/earbuds.png",
-    "description_en": "Out of stock demo item.",
-    "description_bn": "স্টক নেই (ডেমো)।"
-  }
-]
-
+{
+  "products": [
+    {
+      "id": "p001",
+      "category": "groceries",
+      "name_en": "Premium Basmati Rice 5kg",
+      "name_bn": "প্রিমিয়াম বাসমতি চাল ৫ কেজি",
+      "price": 850,
+      "oldPrice": 950,
+      "rating": 4.5,
+      "reviews": 234,
+      "discount": 11,
+      "stock": 45,
+      "delivery": "1-2 days",
+      "image": "/uploads/rice.png",
+      "description_en": "Quality checked product. 7 days return (demo).",
+      "description_bn": "কোয়ালিটি চেকড পণ্য। ৭ দিনের রিটার্ন (ডেমো)।"
+    },
+    {
+      "id": "p002",
+      "category": "electronics",
+      "name_en": "Wireless Earbuds",
+      "name_bn": "ওয়্যারলেস ইয়ারবাডস",
+      "price": 2499,
+      "oldPrice": 3499,
+      "rating": 4.7,
+      "reviews": 891,
+      "discount": 29,
+      "stock": 0,
+      "delivery": "1-2 days",
+      "image": "/uploads/earbuds.png",
+      "description_en": "Out of stock demo item.",
+      "description_bn": "স্টক নেই (ডেমো)।"
+    }
+  ]
+}
