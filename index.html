@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Shohoz Bazar — Shop Easy, Live Easy</title>
-  <meta name="description" content="Shohoz Bazar - Mixed online marketplace in Bangladesh. Bangla/English, BDT, bKash/Nagad/COD." />
+  <meta name="description" content="Shohoz Bazar - Mixed online marketplace in Bangladesh. Bangla/English, BDT, bKash/Nagad/COD via Messenger." />
 
   <!-- React 18 -->
   <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
@@ -32,6 +32,55 @@
     const formatBDT = (n) => `৳${Number(n || 0).toLocaleString("en-US")}`;
     const genOrderId = () => `SB${Math.floor(100000 + Math.random() * 900000)}`;
 
+    // ✅ Your FB details
+    const FB_PAGE_ID = "61582055433127";
+    const FB_PAGE_LINK = "https://www.facebook.com/profile.php?id=61582055433127";
+    const FB_MESSENGER_LINK = `https://m.me/${FB_PAGE_ID}`;
+
+    async function copyText(text) {
+      try {
+        await navigator.clipboard.writeText(text);
+        return true;
+      } catch (e) {
+        return false;
+      }
+    }
+
+    function buildProductMessage({ storeName, product, qty, lang }) {
+      const pname = product?.name?.[lang] || product?.name?.en || "Product";
+      const lineTotal = (product?.price || 0) * (qty || 1);
+      return [
+        `Hello ${storeName}! I want to order:`,
+        `• Product: ${pname}`,
+        `• Price: ${formatBDT(product?.price)}`,
+        `• Qty: ${qty}`,
+        `• Total: ${formatBDT(lineTotal)}`,
+        `• Product ID: ${product?.id}`,
+        ``,
+        `Please confirm availability & delivery.`
+      ].join("\n");
+    }
+
+    function buildCartMessage({ storeName, cart, lang, deliveryFee, discount, grandTotal }) {
+      const lines = [];
+      lines.push(`Hello ${storeName}! I want to place an order (Cart Checkout):`);
+      lines.push(`Order Items:`);
+      cart.forEach((i, idx) => {
+        const pname = i?.name?.[lang] || i?.name?.en || "Product";
+        lines.push(`${idx+1}) ${pname} — ${formatBDT(i.price)} × ${i.quantity} = ${formatBDT(i.price * i.quantity)}`);
+      });
+      lines.push(``);
+      lines.push(`Delivery Fee: ${deliveryFee === 0 ? "FREE" : formatBDT(deliveryFee)}`);
+      if (discount > 0) lines.push(`Discount: −${formatBDT(discount)}`);
+      lines.push(`Grand Total: ${formatBDT(grandTotal)}`);
+      lines.push(``);
+      lines.push(`Please confirm delivery & payment method.`);
+      return lines.join("\n");
+    }
+
+    // -------------------------
+    // Translations
+    // -------------------------
     const TRANSLATIONS = {
       en: {
         tagline: "Shop Easy, Live Easy",
@@ -54,6 +103,7 @@
         addToCart: "Add to Cart",
         buyNow: "Buy Now",
         inStock: "In stock",
+        outOfStock: "Out of stock",
         onlyLeft: "Only left",
         delivery: "Delivery",
         reviews: "reviews",
@@ -63,7 +113,7 @@
         total: "Total",
         coupon: "Coupon",
         apply: "Apply",
-        proceedCheckout: "Proceed to Checkout",
+        proceedCheckout: "Checkout on Messenger",
         continueShopping: "Continue Shopping",
         emptyCartTitle: "Your cart is empty",
         emptyCartSubtitle: "Add some products to get started!",
@@ -76,17 +126,8 @@
         cod: "Cash on Delivery",
         payBkash: "Pay with bKash",
         payNagad: "Pay with Nagad",
-        name: "Full Name",
-        phone: "Phone",
-        division: "Division",
-        district: "District",
-        thana: "Thana/Upazila",
-        area: "Area",
-        roadHouse: "Road/House",
-        landmark: "Landmark (optional)",
-        note: "Note (optional)",
-        orderPlaced: "Order Placed!",
-        orderPlacedMsg: "Your order has been created successfully.",
+        orderPlaced: "Order Created!",
+        orderPlacedMsg: "We will confirm on Messenger.",
         trackOrder: "Track Order",
         track: "Track",
         orderId: "Order ID",
@@ -114,6 +155,10 @@
         privacy: "Privacy Policy",
         terms: "Terms & Conditions",
         support: "Support",
+        messageUs: "Message Us",
+        messageToOrder: "Message to Order",
+        copiedHint: "Order info copied. Paste it in Messenger.",
+        openMessenger: "Open Messenger",
       },
       bn: {
         tagline: "সহজে কিনুন, সহজে থাকুন",
@@ -136,6 +181,7 @@
         addToCart: "কার্টে যোগ করুন",
         buyNow: "এখনই কিনুন",
         inStock: "স্টকে আছে",
+        outOfStock: "স্টক শেষ",
         onlyLeft: "অবশিষ্ট",
         delivery: "ডেলিভারি",
         reviews: "রিভিউ",
@@ -145,7 +191,7 @@
         total: "মোট",
         coupon: "কুপন",
         apply: "প্রয়োগ",
-        proceedCheckout: "চেকআউট করুন",
+        proceedCheckout: "মেসেঞ্জারে চেকআউট",
         continueShopping: "শপিং চালিয়ে যান",
         emptyCartTitle: "আপনার কার্ট খালি",
         emptyCartSubtitle: "শুরু করতে কিছু পণ্য যোগ করুন!",
@@ -158,17 +204,8 @@
         cod: "ক্যাশ অন ডেলিভারি",
         payBkash: "bKash দিয়ে পেমেন্ট",
         payNagad: "Nagad দিয়ে পেমেন্ট",
-        name: "নাম",
-        phone: "মোবাইল",
-        division: "বিভাগ",
-        district: "জেলা",
-        thana: "থানা/উপজেলা",
-        area: "এলাকা",
-        roadHouse: "রোড/বাড়ি",
-        landmark: "ল্যান্ডমার্ক (ঐচ্ছিক)",
-        note: "নোট (ঐচ্ছিক)",
-        orderPlaced: "অর্ডার সম্পন্ন!",
-        orderPlacedMsg: "আপনার অর্ডার সফলভাবে তৈরি হয়েছে।",
+        orderPlaced: "অর্ডার তৈরি হয়েছে!",
+        orderPlacedMsg: "মেসেঞ্জারে কনফার্ম করা হবে।",
         trackOrder: "অর্ডার ট্র্যাক করুন",
         track: "ট্র্যাক",
         orderId: "অর্ডার আইডি",
@@ -196,6 +233,10 @@
         privacy: "প্রাইভেসি",
         terms: "শর্তাবলী",
         support: "সাপোর্ট",
+        messageUs: "মেসেজ করুন",
+        messageToOrder: "অর্ডারের জন্য মেসেজ",
+        copiedHint: "অর্ডার তথ্য কপি হয়েছে। মেসেঞ্জারে পেস্ট করুন।",
+        openMessenger: "মেসেঞ্জার খুলুন",
       }
     };
 
@@ -203,13 +244,21 @@
     // App
     // -------------------------
     function ShohozBazarApp() {
+      const STORE_NAME = "Shohoz Bazar";
+
       const [lang, setLang] = useState("bn");
       const t = TRANSLATIONS[lang];
 
       const [cart, setCart] = useState([]);
       const [wishlist, setWishlist] = useState([]);
-      const [page, setPage] = useState("home"); // home | shop | product | cart | checkout | wishlist | track
+      const [page, setPage] = useState("home"); // home | shop | product | cart
       const [selectedProduct, setSelectedProduct] = useState(null);
+
+      const [toast, setToast] = useState(null); // {type, msg}
+      const showToast = (msg, type="ok") => {
+        setToast({ type, msg });
+        setTimeout(() => setToast(null), 3200);
+      };
 
       const [searchQuery, setSearchQuery] = useState("");
       const [selectedCategory, setSelectedCategory] = useState("all");
@@ -221,13 +270,11 @@
       const [coupon, setCoupon] = useState("");
       const [appliedCoupon, setAppliedCoupon] = useState(null);
 
-      const [order, setOrder] = useState(null); // {id, items, total, paymentMethod, statusIndex}
-      const [trackInput, setTrackInput] = useState("");
-
       // Demo products
+      // ✅ Tip: set stock: 0 for out-of-stock demo
       const products = useMemo(() => ([
         { id: 1,  name: {en:'Premium Basmati Rice 5kg', bn:'প্রিমিয়াম বাসমতি চাল ৫ কেজি'}, category: 'groceries', price: 850, oldPrice: 950, rating: 4.5, reviews: 234, image: '🌾', discount: 11, stock: 45, delivery: '1-2 days' },
-        { id: 2,  name: {en:'Cotton T-Shirt - Blue', bn:'কটন টি-শার্ট - নীল'}, category: 'fashion', price: 599, oldPrice: 799, rating: 4.3, reviews: 156, image: '👕', discount: 25, stock: 23, delivery: '2-3 days' },
+        { id: 2,  name: {en:'Cotton T-Shirt - Blue', bn:'কটন টি-শার্ট - নীল'}, category: 'fashion', price: 599, oldPrice: 799, rating: 4.3, reviews: 156, image: '👕', discount: 25, stock: 0, delivery: '2-3 days' }, // out of stock
         { id: 3,  name: {en:'Wireless Earbuds', bn:'ওয়্যারলেস ইয়ারবাডস'}, category: 'electronics', price: 2499, oldPrice: 3499, rating: 4.7, reviews: 891, image: '🎧', discount: 29, stock: 12, delivery: '1-2 days' },
         { id: 4,  name: {en:'Face Cream SPF 50', bn:'ফেস ক্রিম SPF ৫০'}, category: 'beauty', price: 450, oldPrice: 600, rating: 4.6, reviews: 445, image: '🧴', discount: 25, stock: 67, delivery: '1-2 days' },
         { id: 5,  name: {en:'Non-Stick Cookware Set', bn:'নন-স্টিক কুকওয়্যার সেট'}, category: 'home', price: 3200, oldPrice: 4500, rating: 4.4, reviews: 203, image: '🍳', discount: 29, stock: 18, delivery: '2-3 days' },
@@ -254,6 +301,10 @@
 
       // Cart logic
       const addToCart = (product, qty=1) => {
+        if (product.stock <= 0) {
+          showToast(t.outOfStock, "warn");
+          return;
+        }
         setCart(prev => {
           const existing = prev.find(i => i.id === product.id);
           if (existing) {
@@ -261,6 +312,7 @@
           }
           return [...prev, {...product, quantity: qty}];
         });
+        showToast(`${t.addToCart}: ${product.name[lang]}`);
       };
 
       const removeFromCart = (productId) => setCart(prev => prev.filter(i => i.id !== productId));
@@ -275,7 +327,12 @@
       const toggleWishlist = (product) => {
         setWishlist(prev => {
           const exists = prev.some(i => i.id === product.id);
-          return exists ? prev.filter(i => i.id !== product.id) : [...prev, product];
+          if (exists) {
+            showToast(`Removed: ${product.name[lang]}`);
+            return prev.filter(i => i.id !== product.id);
+          }
+          showToast(`Saved: ${product.name[lang]}`);
+          return [...prev, product];
         });
       };
 
@@ -322,57 +379,7 @@
         return list;
       }, [products, selectedCategory, searchQuery, minPrice, maxPrice, sort]);
 
-      // Checkout form
-      const [checkoutData, setCheckoutData] = useState({
-        name: "", phone: "",
-        division: "", district: "", thana: "", area: "",
-        roadHouse: "", landmark: "", note: "",
-        paymentMethod: "cod", // cod | bkash | nagad
-      });
-
-      const setField = (k, v) => setCheckoutData(prev => ({...prev, [k]: v}));
-
-      const canPlaceOrder = useMemo(() => {
-        if (cart.length === 0) return false;
-        const required = ["name","phone","division","district","thana","area","roadHouse"];
-        return required.every(k => String(checkoutData[k] || "").trim().length > 0);
-      }, [cart.length, checkoutData]);
-
-      const placeOrder = () => {
-        if (!canPlaceOrder) return;
-        const newOrder = {
-          id: genOrderId(),
-          items: cart,
-          total: grandTotal,
-          paymentMethod: checkoutData.paymentMethod,
-          createdAt: new Date().toISOString(),
-          statusIndex: 1, // 1 confirmed (0 not used)
-        };
-        setOrder(newOrder);
-        setCart([]);
-        setAppliedCoupon(null);
-        setCoupon("");
-        setPage("track");
-      };
-
-      // Track simulation (demo)
-      const statusSteps = useMemo(() => ([
-        { key: "confirmed", label: t.confirmed },
-        { key: "packed", label: t.packed },
-        { key: "shipped", label: t.shipped },
-        { key: "out", label: t.outForDelivery },
-        { key: "delivered", label: t.delivered },
-      ]), [t]);
-
-      const bumpStatus = () => {
-        setOrder(prev => {
-          if (!prev) return prev;
-          const next = Math.min(prev.statusIndex + 1, statusSteps.length);
-          return {...prev, statusIndex: next};
-        });
-      };
-
-      const goProduct = (p) => { setSelectedProduct(p); setPage("product"); };
+      const goProduct = (p) => { setSelectedProduct(p); setPage("product"); window.scrollTo({top:0, behavior:"smooth"}); };
 
       // Coupon apply
       const applyCoupon = () => {
@@ -380,8 +387,10 @@
         if (!code) return;
         if (code === "SB10" || code === "SHIPFREE") {
           setAppliedCoupon({ code });
+          showToast(`Applied: ${code}`);
         } else {
           setAppliedCoupon({ code: "INVALID" });
+          showToast("Invalid coupon", "warn");
         }
       };
 
@@ -393,11 +402,48 @@
         setSelectedCategory("all");
       };
 
+      // ✅ Messenger actions
+      const messageProduct = async (product, qty=1) => {
+        const msg = buildProductMessage({ storeName: STORE_NAME, product, qty, lang });
+        const copied = await copyText(msg);
+        if (!copied) {
+          // fallback
+          window.prompt("Copy and paste this message in Messenger:", msg);
+        } else {
+          showToast(t.copiedHint);
+        }
+        window.open(FB_MESSENGER_LINK, "_blank");
+      };
+
+      const checkoutOnMessenger = async () => {
+        if (cart.length === 0) {
+          showToast(t.emptyCartTitle, "warn");
+          return;
+        }
+        const msg = buildCartMessage({
+          storeName: STORE_NAME,
+          cart,
+          lang,
+          deliveryFee,
+          discount: couponDiscount,
+          grandTotal
+        });
+        const copied = await copyText(msg);
+        if (!copied) {
+          window.prompt("Copy and paste this message in Messenger:", msg);
+        } else {
+          showToast(t.copiedHint);
+        }
+        window.open(FB_MESSENGER_LINK, "_blank");
+      };
+
       // -------------------------
       // UI Components
       // -------------------------
       const ProductCard = ({ product }) => {
         const isWished = wishlist.some(w => w.id === product.id);
+        const out = product.stock <= 0;
+
         return (
           <div className="bg-white rounded-xl shadow-sm hover:shadow-lg transition overflow-hidden">
             <div
@@ -410,6 +456,12 @@
                   -{product.discount}%
                 </div>
               )}
+              {out && (
+                <div className="absolute bottom-2 left-2 bg-gray-900 text-white px-2 py-1 rounded-lg text-xs font-bold">
+                  {t.outOfStock}
+                </div>
+              )}
+
               <button
                 onClick={(e) => { e.stopPropagation(); toggleWishlist(product); }}
                 className="absolute top-2 right-2 p-2 bg-white/90 rounded-full shadow hover:bg-white"
@@ -420,14 +472,12 @@
             </div>
 
             <div className="p-4">
-              <div className="flex items-start justify-between gap-2">
-                <h3
-                  className="font-semibold text-sm line-clamp-2 cursor-pointer hover:text-emerald-600"
-                  onClick={() => goProduct(product)}
-                >
-                  {product.name[lang]}
-                </h3>
-              </div>
+              <h3
+                className="font-semibold text-sm line-clamp-2 cursor-pointer hover:text-emerald-600"
+                onClick={() => goProduct(product)}
+              >
+                {product.name[lang]}
+              </h3>
 
               <div className="flex items-center gap-1 mt-2">
                 <span>⭐</span>
@@ -446,22 +496,32 @@
                 🚚 {t.delivery}: {product.delivery}
               </div>
 
-              {product.stock < 20 && (
+              {!out && product.stock < 20 && (
                 <div className="text-xs text-red-600 mt-2">⚠️ {t.onlyLeft}: {product.stock}</div>
               )}
 
               <div className="mt-3 grid grid-cols-2 gap-2">
+                {!out ? (
+                  <button
+                    onClick={() => addToCart(product, 1)}
+                    className="w-full bg-orange-500 hover:bg-orange-600 text-white py-2 rounded-lg font-semibold"
+                  >
+                    {t.addToCart}
+                  </button>
+                ) : (
+                  <button
+                    onClick={() => toggleWishlist(product)}
+                    className="w-full bg-gray-900 hover:bg-gray-800 text-white py-2 rounded-lg font-semibold"
+                  >
+                    {t.wishlist}
+                  </button>
+                )}
+
                 <button
-                  onClick={() => addToCart(product, 1)}
-                  className="w-full bg-orange-500 hover:bg-orange-600 text-white py-2 rounded-lg font-semibold"
-                >
-                  {t.addToCart}
-                </button>
-                <button
-                  onClick={() => { addToCart(product, 1); setPage("cart"); }}
+                  onClick={() => out ? messageProduct(product, 1) : messageProduct(product, 1)}
                   className="w-full border border-gray-300 hover:border-emerald-600 py-2 rounded-lg font-semibold"
                 >
-                  {t.viewDetails}
+                  {out ? t.messageToOrder : t.buyNow}
                 </button>
               </div>
             </div>
@@ -472,16 +532,22 @@
       const Header = () => (
         <header className="sticky top-0 z-50 bg-white shadow-sm">
           <div className="bg-emerald-600 text-white py-2 px-4 text-sm text-center">
-            🎉 Flash Sale | Free Delivery on orders above {formatBDT(FREE_SHIP_THRESHOLD)} | bKash/Nagad/COD
+            🎉 Flash Sale | Free Delivery on orders above {formatBDT(FREE_SHIP_THRESHOLD)} | bKash/Nagad/COD via Messenger
           </div>
 
           <div className="container mx-auto px-4 py-3">
             <div className="flex items-center justify-between gap-4">
               <div
-                className="flex items-center gap-2 cursor-pointer"
+                className="flex items-center gap-3 cursor-pointer"
                 onClick={() => { setPage("home"); setSelectedProduct(null); }}
               >
-                <div className="w-10 h-10 bg-emerald-600 rounded-xl flex items-center justify-center text-white text-xl font-bold">S</div>
+                <!-- ✅ your logo file in same directory -->
+                <img
+                  src="SB logoM.png"
+                  alt="Shohoz Bazar Logo"
+                  className="w-11 h-11 rounded-xl object-cover border"
+                  onError={(e)=>{ e.currentTarget.style.display="none"; }}
+                />
                 <div>
                   <div className="font-extrabold text-lg text-emerald-700">Shohoz Bazar</div>
                   <div className="text-xs text-gray-500 hidden sm:block">{t.tagline}</div>
@@ -501,12 +567,23 @@
                 </div>
               </div>
 
-              <div className="flex items-center gap-3">
-                <button
+              <div className="flex items-center gap-2 sm:gap-3">
+                <a
+                  href={FB_PAGE_LINK}
+                  target="_blank"
+                  rel="noreferrer"
                   className="hidden md:flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-100"
-                  onClick={() => alert("Demo: account page can be added next")}
+                  title="Facebook Page"
                 >
-                  <span>👤</span><span className="text-sm">{t.account}</span>
+                  <span>📘</span><span className="text-sm font-semibold">{t.contact}</span>
+                </a>
+
+                <button
+                  className="hidden md:flex items-center gap-2 px-3 py-2 rounded-lg bg-gray-900 text-white hover:bg-gray-800"
+                  onClick={() => window.open(FB_MESSENGER_LINK, "_blank")}
+                  title="Message us on Messenger"
+                >
+                  <span>💬</span><span className="text-sm font-semibold">{t.messageUs}</span>
                 </button>
 
                 <button
@@ -548,6 +625,23 @@
                 />
                 <span className="absolute right-3 top-2.5 text-gray-400">🔍</span>
               </div>
+
+              <div className="mt-2 flex gap-2">
+                <button
+                  className="flex-1 px-3 py-2 rounded-xl bg-gray-900 text-white font-bold"
+                  onClick={() => window.open(FB_MESSENGER_LINK, "_blank")}
+                >
+                  💬 {t.messageUs}
+                </button>
+                <a
+                  className="flex-1 px-3 py-2 rounded-xl border font-bold text-center"
+                  href={FB_PAGE_LINK}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  📘 {t.contact}
+                </a>
+              </div>
             </div>
           </div>
 
@@ -579,12 +673,21 @@
               <div>
                 <h3 className="font-bold text-lg mb-4">Shohoz Bazar</h3>
                 <p className="text-gray-400 text-sm mb-4">
-                  Mixed online marketplace for Bangladesh — fast browsing, easy checkout.
+                  Mixed online marketplace for Bangladesh — browse fast, order via Messenger.
                 </p>
                 <div className="flex gap-2 text-sm">
                   <span className="px-2 py-1 rounded bg-emerald-700">bKash</span>
                   <span className="px-2 py-1 rounded bg-orange-600">Nagad</span>
                   <span className="px-2 py-1 rounded bg-gray-700">COD</span>
+                </div>
+
+                <div className="mt-4 flex gap-2">
+                  <a href={FB_PAGE_LINK} target="_blank" rel="noreferrer" className="px-3 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-sm font-bold">
+                    📘 Facebook
+                  </a>
+                  <a href={FB_MESSENGER_LINK} target="_blank" rel="noreferrer" className="px-3 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-sm font-bold">
+                    💬 Messenger
+                  </a>
                 </div>
               </div>
 
@@ -625,16 +728,21 @@
 
       const MobileBottomNav = () => (
         <div className="fixed bottom-0 left-0 right-0 bg-white border-t shadow-lg md:hidden z-50">
-          <div className="grid grid-cols-4 gap-1 p-2">
+          <div className="grid grid-cols-5 gap-1 p-2">
             {[
               { icon: '🏠', label: t.home, page: 'home' },
               { icon: '🛍️', label: t.shop, page: 'shop' },
+              { icon: '💬', label: t.messageUs, action: () => window.open(FB_MESSENGER_LINK, "_blank") },
               { icon: '❤️', label: t.wishlist, page: 'wishlist', badge: wishlist.length },
               { icon: '🛒', label: t.cart, page: 'cart', badge: cartCount },
             ].map((item, i) => (
-              <button key={i} onClick={() => setPage(item.page)} className="flex flex-col items-center gap-1 py-2 relative">
+              <button
+                key={i}
+                onClick={() => item.action ? item.action() : setPage(item.page)}
+                className="flex flex-col items-center gap-1 py-2 relative"
+              >
                 <span className="text-xl">{item.icon}</span>
-                <span className="text-xs">{item.label}</span>
+                <span className="text-[11px]">{item.label}</span>
                 {item.badge > 0 && (
                   <span className="absolute top-1 right-2 bg-red-500 text-white text-xs w-4 h-4 rounded-full flex items-center justify-center">
                     {item.badge}
@@ -646,6 +754,18 @@
         </div>
       );
 
+      const Toast = () => (
+        toast ? (
+          <div className="fixed top-4 left-1/2 -translate-x-1/2 z-[9999]">
+            <div className={`px-4 py-3 rounded-xl shadow-lg text-sm font-bold ${
+              toast.type === "warn" ? "bg-orange-600 text-white" : "bg-gray-900 text-white"
+            }`}>
+              {toast.msg}
+            </div>
+          </div>
+        ) : null
+      );
+
       // -------------------------
       // Pages
       // -------------------------
@@ -655,12 +775,21 @@
             <div className="container mx-auto text-center">
               <h1 className="text-4xl md:text-5xl font-extrabold mb-4">{t.heroTitle}</h1>
               <p className="text-xl mb-8">{t.heroSubtitle}</p>
-              <button
-                onClick={() => setPage("shop")}
-                className="bg-orange-500 hover:bg-orange-600 text-white px-8 py-3 rounded-xl text-lg font-bold transition"
-              >
-                {t.shopNow}
-              </button>
+
+              <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                <button
+                  onClick={() => setPage("shop")}
+                  className="bg-orange-500 hover:bg-orange-600 text-white px-8 py-3 rounded-xl text-lg font-bold transition"
+                >
+                  {t.shopNow}
+                </button>
+                <button
+                  onClick={() => window.open(FB_MESSENGER_LINK, "_blank")}
+                  className="bg-gray-900 hover:bg-gray-800 text-white px-8 py-3 rounded-xl text-lg font-bold transition"
+                >
+                  💬 {t.messageUs}
+                </button>
+              </div>
             </div>
           </div>
 
@@ -789,21 +918,10 @@
 
       const ProductPage = () => {
         const p = selectedProduct;
-        if (!p) {
-          return (
-            <div className="container mx-auto px-4 py-12 text-center">
-              <div className="text-6xl mb-4">😅</div>
-              <p className="font-semibold">No product selected.</p>
-              <button className="mt-4 bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-3 rounded-xl font-bold"
-                onClick={() => setPage("shop")}
-              >
-                {t.shop}
-              </button>
-            </div>
-          );
-        }
+        if (!p) return null;
 
         const isWished = wishlist.some(w => w.id === p.id);
+        const out = p.stock <= 0;
 
         return (
           <div className="container mx-auto px-4 py-8">
@@ -845,22 +963,30 @@
                 </div>
 
                 <div className="mt-4 text-sm text-gray-700">
-                  <div className="flex items-center gap-2">✅ <span>{t.inStock}: {p.stock}</span></div>
+                  {out ? (
+                    <div className="flex items-center gap-2">⛔ <span className="font-bold text-red-600">{t.outOfStock}</span></div>
+                  ) : (
+                    <div className="flex items-center gap-2">✅ <span>{t.inStock}: {p.stock}</span></div>
+                  )}
                   <div className="flex items-center gap-2 mt-1">🚚 <span>{t.delivery}: {p.delivery}</span></div>
                 </div>
 
                 <div className="mt-6 flex gap-3">
                   <button
+                    disabled={out}
                     onClick={() => addToCart(p, 1)}
-                    className="flex-1 bg-orange-500 hover:bg-orange-600 text-white py-3 rounded-xl font-extrabold"
+                    className={`flex-1 py-3 rounded-xl font-extrabold ${
+                      out ? "bg-gray-200 text-gray-500 cursor-not-allowed" : "bg-orange-500 hover:bg-orange-600 text-white"
+                    }`}
                   >
                     {t.addToCart}
                   </button>
+
                   <button
-                    onClick={() => { addToCart(p, 1); setPage("checkout"); }}
-                    className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white py-3 rounded-xl font-extrabold"
+                    onClick={() => messageProduct(p, 1)}
+                    className="flex-1 bg-gray-900 hover:bg-gray-800 text-white py-3 rounded-xl font-extrabold"
                   >
-                    {t.buyNow}
+                    {out ? t.messageToOrder : t.buyNow}
                   </button>
                 </div>
 
@@ -868,8 +994,8 @@
                   <h3 className="font-extrabold mb-2">Details</h3>
                   <ul className="text-sm text-gray-700 list-disc pl-5 space-y-1">
                     <li>Quality checked product</li>
-                    <li>7 days return policy (demo)</li>
-                    <li>Support via phone/WhatsApp (demo)</li>
+                    <li>Messenger order confirmation</li>
+                    <li>Support via Facebook Page</li>
                   </ul>
                 </div>
               </div>
@@ -990,10 +1116,10 @@
                   </div>
 
                   <button
-                    onClick={() => setPage("checkout")}
-                    className="w-full bg-orange-500 hover:bg-orange-600 text-white py-3 rounded-xl font-extrabold text-lg transition mb-3"
+                    onClick={checkoutOnMessenger}
+                    className="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-3 rounded-xl font-extrabold text-lg transition mb-3"
                   >
-                    {t.proceedCheckout}
+                    💬 {t.proceedCheckout}
                   </button>
 
                   <button
@@ -1002,6 +1128,10 @@
                   >
                     {t.continueShopping}
                   </button>
+
+                  <div className="mt-3 text-xs text-gray-500">
+                    Note: We copy your order info automatically. Paste it in Messenger to confirm.
+                  </div>
                 </div>
               </div>
             </div>
@@ -1037,231 +1167,19 @@
         </div>
       );
 
-      const CheckoutPage = () => (
-        <div className="container mx-auto px-4 py-8">
-          <div className="flex items-center justify-between flex-wrap gap-3 mb-6">
-            <h1 className="text-3xl font-extrabold">{t.checkout}</h1>
-            <button className="text-emerald-700 font-semibold hover:underline" onClick={() => setPage("cart")}>
-              ← {t.cart}
-            </button>
-          </div>
-
-          {cart.length === 0 ? (
-            <div className="bg-white rounded-2xl shadow-sm p-8 text-center">
-              <div className="text-6xl mb-4">🫥</div>
-              <h2 className="text-2xl font-extrabold mb-2">{t.emptyCartTitle}</h2>
-              <button className="mt-4 bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-3 rounded-xl font-bold"
-                onClick={() => setPage("shop")}
-              >
-                {t.startShopping}
-              </button>
-            </div>
-          ) : (
-            <div className="grid lg:grid-cols-3 gap-8">
-              <div className="lg:col-span-2 space-y-6">
-                <div className="bg-white rounded-2xl shadow-sm p-6">
-                  <h2 className="text-xl font-extrabold mb-4">1) {t.address}</h2>
-                  <div className="grid md:grid-cols-2 gap-4">
-                    <input className="border rounded-xl px-4 py-3" placeholder={t.name} value={checkoutData.name} onChange={(e)=>setField("name", e.target.value)} />
-                    <input className="border rounded-xl px-4 py-3" placeholder={t.phone} value={checkoutData.phone} onChange={(e)=>setField("phone", e.target.value)} />
-                    <input className="border rounded-xl px-4 py-3" placeholder={t.division} value={checkoutData.division} onChange={(e)=>setField("division", e.target.value)} />
-                    <input className="border rounded-xl px-4 py-3" placeholder={t.district} value={checkoutData.district} onChange={(e)=>setField("district", e.target.value)} />
-                    <input className="border rounded-xl px-4 py-3" placeholder={t.thana} value={checkoutData.thana} onChange={(e)=>setField("thana", e.target.value)} />
-                    <input className="border rounded-xl px-4 py-3" placeholder={t.area} value={checkoutData.area} onChange={(e)=>setField("area", e.target.value)} />
-                    <input className="border rounded-xl px-4 py-3 md:col-span-2" placeholder={t.roadHouse} value={checkoutData.roadHouse} onChange={(e)=>setField("roadHouse", e.target.value)} />
-                    <input className="border rounded-xl px-4 py-3 md:col-span-2" placeholder={t.landmark} value={checkoutData.landmark} onChange={(e)=>setField("landmark", e.target.value)} />
-                    <textarea className="border rounded-xl px-4 py-3 md:col-span-2" placeholder={t.note} value={checkoutData.note} onChange={(e)=>setField("note", e.target.value)} />
-                  </div>
-                </div>
-
-                <div className="bg-white rounded-2xl shadow-sm p-6">
-                  <h2 className="text-xl font-extrabold mb-4">2) {t.payment}</h2>
-                  <div className="grid md:grid-cols-3 gap-3">
-                    {[
-                      { id: "cod", label: t.cod, badge: "💵" },
-                      { id: "bkash", label: t.payBkash, badge: "🟢" },
-                      { id: "nagad", label: t.payNagad, badge: "🟠" },
-                    ].map(m => (
-                      <button
-                        key={m.id}
-                        onClick={() => setField("paymentMethod", m.id)}
-                        className={`border rounded-2xl p-4 text-left hover:border-emerald-600 transition ${
-                          checkoutData.paymentMethod === m.id ? "border-emerald-600 bg-emerald-50" : "border-gray-200 bg-white"
-                        }`}
-                      >
-                        <div className="text-2xl">{m.badge}</div>
-                        <div className="mt-2 font-extrabold">{m.label}</div>
-                        <div className="text-xs text-gray-600 mt-1">
-                          {m.id === "cod" ? "Pay after delivery" : "Secure online payment (demo)"}
-                        </div>
-                      </button>
-                    ))}
-                  </div>
-
-                  <div className="mt-4 text-sm text-gray-600">
-                    Demo note: In real build, bKash/Nagad will redirect to gateway and confirm via callback/webhook.
-                  </div>
-                </div>
-              </div>
-
-              <div className="lg:col-span-1">
-                <div className="bg-white rounded-2xl shadow-sm p-6 sticky top-24">
-                  <h2 className="text-xl font-extrabold mb-4">3) {t.reviewOrder}</h2>
-
-                  <div className="space-y-3 text-sm">
-                    {cart.map(i => (
-                      <div key={i.id} className="flex justify-between gap-3">
-                        <div className="flex-1">
-                          <div className="font-bold line-clamp-2">{i.name[lang]} × {i.quantity}</div>
-                          <div className="text-gray-500">{formatBDT(i.price)} each</div>
-                        </div>
-                        <div className="font-extrabold">{formatBDT(i.price * i.quantity)}</div>
-                      </div>
-                    ))}
-                  </div>
-
-                  <div className="border-t my-4"></div>
-
-                  <div className="space-y-2 text-sm">
-                    <div className="flex justify-between"><span>{t.subtotal}</span><span className="font-bold">{formatBDT(cartTotal)}</span></div>
-                    <div className="flex justify-between"><span>{t.deliveryFee}</span><span className="font-bold">{deliveryFee === 0 ? t.free : formatBDT(deliveryFee)}</span></div>
-                    {couponDiscount > 0 && (
-                      <div className="flex justify-between text-emerald-700"><span>Discount</span><span className="font-bold">−{formatBDT(couponDiscount)}</span></div>
-                    )}
-                  </div>
-
-                  <div className="border-t my-4"></div>
-
-                  <div className="flex justify-between text-lg font-extrabold mb-4">
-                    <span>{t.total}</span>
-                    <span className="text-emerald-700">{formatBDT(grandTotal)}</span>
-                  </div>
-
-                  <button
-                    disabled={!canPlaceOrder}
-                    onClick={placeOrder}
-                    className={`w-full py-3 rounded-xl font-extrabold text-lg transition ${
-                      canPlaceOrder ? "bg-emerald-600 hover:bg-emerald-700 text-white" : "bg-gray-200 text-gray-500 cursor-not-allowed"
-                    }`}
-                  >
-                    {t.placeOrder}
-                  </button>
-
-                  {!canPlaceOrder && (
-                    <div className="mt-3 text-sm text-red-600">
-                      Please fill required address fields.
-                    </div>
-                  )}
-                </div>
-              </div>
-            </div>
-          )}
-        </div>
-      );
-
-      const TrackPage = () => {
-        const o = order;
-        return (
-          <div className="container mx-auto px-4 py-8">
-            <div className="flex items-center justify-between flex-wrap gap-3 mb-6">
-              <h1 className="text-3xl font-extrabold">{t.trackOrder}</h1>
-              <button className="text-emerald-700 font-semibold hover:underline" onClick={() => setPage("home")}>
-                {t.backHome}
-              </button>
-            </div>
-
-            <div className="grid lg:grid-cols-2 gap-8">
-              <div className="bg-white rounded-2xl shadow-sm p-6">
-                <h2 className="text-xl font-extrabold mb-4">{t.track}</h2>
-                <div className="flex gap-2">
-                  <input
-                    className="flex-1 border rounded-xl px-4 py-3"
-                    placeholder={`${t.orderId} (e.g., ${o?.id || "SB123456"})`}
-                    value={trackInput}
-                    onChange={(e)=>setTrackInput(e.target.value)}
-                  />
-                  <button
-                    className="px-5 py-3 rounded-xl bg-gray-900 text-white font-extrabold"
-                    onClick={() => {
-                      // demo: if matches current order id, show it
-                      if (order && trackInput.trim().toUpperCase() === order.id.toUpperCase()) {
-                        alert("Order found (demo).");
-                      } else {
-                        alert("Demo: only current order ID will match in this static version.");
-                      }
-                    }}
-                  >
-                    {t.track}
-                  </button>
-                </div>
-
-                {o ? (
-                  <div className="mt-6">
-                    <div className="text-2xl font-extrabold mb-1">{t.orderPlaced}</div>
-                    <div className="text-gray-600">{t.orderPlacedMsg}</div>
-
-                    <div className="mt-4 p-4 rounded-xl bg-emerald-50 border border-emerald-100">
-                      <div className="font-extrabold">{t.orderId}: {o.id}</div>
-                      <div className="text-sm text-gray-600 mt-1">
-                        Payment: <span className="font-bold">{o.paymentMethod.toUpperCase()}</span> • Total: <span className="font-bold">{formatBDT(o.total)}</span>
-                      </div>
-                    </div>
-
-                    <button
-                      className="mt-4 w-full bg-orange-500 hover:bg-orange-600 text-white py-3 rounded-xl font-extrabold"
-                      onClick={bumpStatus}
-                      disabled={o.statusIndex >= statusSteps.length}
-                    >
-                      Demo: Advance Status
-                    </button>
-                  </div>
-                ) : (
-                  <div className="mt-6 text-gray-600">
-                    No recent order in this demo.
-                  </div>
-                )}
-              </div>
-
-              <div className="bg-white rounded-2xl shadow-sm p-6">
-                <h2 className="text-xl font-extrabold mb-4">{t.statusTimeline}</h2>
-                {!o ? (
-                  <div className="text-gray-600">Place an order to see tracking timeline.</div>
-                ) : (
-                  <div className="space-y-3">
-                    {statusSteps.map((s, idx) => {
-                      const stepNo = idx + 1;
-                      const done = stepNo <= o.statusIndex;
-                      return (
-                        <div key={s.key} className={`flex items-center gap-3 p-3 rounded-xl border ${done ? "border-emerald-200 bg-emerald-50" : "border-gray-200 bg-white"}`}>
-                          <div className={`w-10 h-10 rounded-full flex items-center justify-center font-extrabold ${done ? "bg-emerald-600 text-white" : "bg-gray-200 text-gray-700"}`}>
-                            {done ? "✓" : stepNo}
-                          </div>
-                          <div className="font-extrabold">{s.label}</div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-        );
-      };
-
       // Render page
       const Page = () => {
         if (page === "home") return <HomePage />;
         if (page === "shop") return <ShopPage />;
         if (page === "product") return <ProductPage />;
         if (page === "cart") return <CartPage />;
-        if (page === "checkout") return <CheckoutPage />;
         if (page === "wishlist") return <WishlistPage />;
-        if (page === "track") return <TrackPage />;
         return <HomePage />;
       };
 
       return (
         <div className="min-h-screen bg-gray-50">
+          <Toast />
           <Header />
           <main className="min-h-screen pb-20 md:pb-0">
             <Page />
