@@ -6,13 +6,14 @@
   <title>Shohoz Bazar — Shop Easy, Live Easy</title>
   <meta name="description" content="Shohoz Bazar - Mixed online marketplace in Bangladesh. Bangla/English, BDT, Messenger checkout." />
 
-  <!-- React 18 -->
   <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
   <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
-  <!-- Tailwind -->
   <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Netlify Identity Widget (REQUIRED for /admin login + invite/reset password UI) -->
+  <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
 
   <style>
     body { margin: 0; padding: 0; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial; }
@@ -29,31 +30,34 @@
     const formatBDT = (n) => `৳${Number(n || 0).toLocaleString("en-US")}`;
     const genOrderId = () => `SB${Math.floor(100000 + Math.random() * 900000)}`;
 
-    // Messenger settings
-    const MESSENGER_LINK = "https://m.me/61582055433127";
-    const PAGE_ID = "61582055433127";
+    const BRAND = {
+      name: "Shohoz Bazar",
+      logo: "SB logoM.png",
+      email: "shohoz.bazzar.bd@gmail.com",
+      phone: "+880 1703-842165",
+      address: "Dhaka, Bangladesh",
+      messengerLink: "https://m.me/61582055433127",
+      pageId: "61582055433127",
+      freeShipThreshold: 500,
+      deliveryFee: 60,
+    };
 
     const TRANSLATIONS = {
       en: {
         tagline: "Shop Easy, Live Easy",
         heroTitle: "Welcome to Shohoz Bazar",
-        heroSubtitle: "Everything in one place, easily",
+        heroSubtitle: "Browse products and checkout instantly via Messenger",
         shopNow: "Shop Now",
         searchPlaceholder: "Search products, brands, categories…",
-        flashSale: "Flash Sale",
-        endsIn: "Ends in",
         topDeals: "Top Deals",
-        customersLove: "Customers Love Shohoz Bazar",
-        account: "Account",
         wishlist: "Wishlist",
         cart: "Cart",
         home: "Home",
         shop: "Shop",
-        categories: "Categories",
         allProducts: "All Products",
         productsFound: "products found",
         addToCart: "Add to Cart",
-        buyNow: "Buy Now",
+        viewDetails: "View Details",
         inStock: "In stock",
         outOfStock: "Out of stock",
         onlyLeft: "Only left",
@@ -65,41 +69,19 @@
         total: "Total",
         coupon: "Coupon",
         apply: "Apply",
-        proceedCheckout: "Proceed to Checkout",
         continueShopping: "Continue Shopping",
         emptyCartTitle: "Your cart is empty",
         emptyCartSubtitle: "Add some products to get started!",
         startShopping: "Start Shopping",
-        checkout: "Checkout",
-        address: "Delivery Address",
-        payment: "Payment Method",
-        reviewOrder: "Review Order",
-        placeOrder: "Place Order",
-        cod: "Cash on Delivery",
-        payBkash: "Pay with bKash",
-        payNagad: "Pay with Nagad",
-        name: "Full Name",
-        phone: "Phone",
-        division: "Division",
-        district: "District",
-        thana: "Thana/Upazila",
-        area: "Area",
-        roadHouse: "Road/House",
-        landmark: "Landmark (optional)",
-        note: "Note (optional)",
-        orderPlaced: "Order Created!",
-        orderPlacedMsg: "We copied your order message. Paste it in Messenger to confirm.",
-        trackOrder: "Track Order",
-        orderId: "Order ID",
+        messengerCheckout: "Checkout via Messenger",
+        copied: "Copied! Opened Messenger",
+        openMessenger: "Open Messenger",
+        loading: "Loading products…",
+        loadFail: "Could not load products. Check /data/products.json",
+        orderCreated: "Order Created!",
+        orderMsg: "We copied the order text. Paste it in Messenger to confirm.",
+        copyOrder: "Copy Order Text",
         backHome: "Back to Home",
-        viewDetails: "View Details",
-        sortBy: "Sort by",
-        sortPopular: "Popular",
-        sortLowHigh: "Price: Low → High",
-        sortHighLow: "Price: High → Low",
-        filterPrice: "Price Range",
-        clear: "Clear",
-        freeShipHint: "Add more to get FREE delivery",
         policies: "Policies",
         quickLinks: "Quick Links",
         about: "About",
@@ -109,33 +91,29 @@
         privacy: "Privacy Policy",
         terms: "Terms & Conditions",
         support: "Support",
-        messengerCheckout: "Checkout via Messenger",
-        copied: "Copied!",
-        copyOrder: "Copy Order Text",
-        openMessenger: "Open Messenger",
-        loading: "Loading products…",
-        loadFail: "Could not load products. Check data/products.json",
+        clear: "Clear",
+        sortBy: "Sort by",
+        sortPopular: "Popular",
+        sortLowHigh: "Price: Low → High",
+        sortHighLow: "Price: High → Low",
+        filterPrice: "Price Range",
+        freeShipHint: "Add more for FREE delivery",
       },
       bn: {
         tagline: "সহজে কিনুন, সহজে থাকুন",
         heroTitle: "Shohoz Bazar এ স্বাগতম",
-        heroSubtitle: "সবকিছু এক জায়গায়, সহজে",
+        heroSubtitle: "পণ্য দেখুন এবং Messenger দিয়ে দ্রুত অর্ডার করুন",
         shopNow: "এখনই কিনুন",
         searchPlaceholder: "পণ্য, ব্র্যান্ড, ক্যাটাগরি খুঁজুন…",
-        flashSale: "ফ্ল্যাশ সেল",
-        endsIn: "শেষ হবে",
         topDeals: "সেরা অফার",
-        customersLove: "ক্রেতারা Shohoz Bazar পছন্দ করেন",
-        account: "অ্যাকাউন্ট",
         wishlist: "ইচ্ছেতালিকা",
         cart: "কার্ট",
         home: "হোম",
         shop: "শপ",
-        categories: "ক্যাটাগরি",
         allProducts: "সব পণ্য",
         productsFound: "টি পণ্য পাওয়া গেছে",
         addToCart: "কার্টে যোগ করুন",
-        buyNow: "এখনই কিনুন",
+        viewDetails: "ডিটেইলস",
         inStock: "স্টকে আছে",
         outOfStock: "স্টক নেই",
         onlyLeft: "অবশিষ্ট",
@@ -147,41 +125,19 @@
         total: "মোট",
         coupon: "কুপন",
         apply: "প্রয়োগ",
-        proceedCheckout: "চেকআউট করুন",
         continueShopping: "শপিং চালিয়ে যান",
         emptyCartTitle: "আপনার কার্ট খালি",
         emptyCartSubtitle: "শুরু করতে কিছু পণ্য যোগ করুন!",
         startShopping: "শপিং শুরু করুন",
-        checkout: "চেকআউট",
-        address: "ডেলিভারি ঠিকানা",
-        payment: "পেমেন্ট পদ্ধতি",
-        reviewOrder: "অর্ডার রিভিউ",
-        placeOrder: "অর্ডার করুন",
-        cod: "ক্যাশ অন ডেলিভারি",
-        payBkash: "bKash দিয়ে পেমেন্ট",
-        payNagad: "Nagad দিয়ে পেমেন্ট",
-        name: "নাম",
-        phone: "মোবাইল",
-        division: "বিভাগ",
-        district: "জেলা",
-        thana: "থানা/উপজেলা",
-        area: "এলাকা",
-        roadHouse: "রোড/বাড়ি",
-        landmark: "ল্যান্ডমার্ক (ঐচ্ছিক)",
-        note: "নোট (ঐচ্ছিক)",
-        orderPlaced: "অর্ডার তৈরি হয়েছে!",
-        orderPlacedMsg: "অর্ডারের লেখা কপি করা হয়েছে। Messenger এ পেস্ট করে কনফার্ম করুন।",
-        trackOrder: "অর্ডার ট্র্যাক করুন",
-        orderId: "অর্ডার আইডি",
+        messengerCheckout: "Messenger দিয়ে অর্ডার করুন",
+        copied: "কপি হয়েছে! Messenger খুলেছে",
+        openMessenger: "Messenger খুলুন",
+        loading: "পণ্য লোড হচ্ছে…",
+        loadFail: "পণ্য লোড হয়নি। /data/products.json চেক করুন",
+        orderCreated: "অর্ডার তৈরি হয়েছে!",
+        orderMsg: "অর্ডার টেক্সট কপি হয়েছে। Messenger এ পেস্ট করে কনফার্ম করুন।",
+        copyOrder: "অর্ডার টেক্সট কপি",
         backHome: "হোমে ফিরে যান",
-        viewDetails: "ডিটেইলস দেখুন",
-        sortBy: "সাজান",
-        sortPopular: "জনপ্রিয়",
-        sortLowHigh: "দাম: কম → বেশি",
-        sortHighLow: "দাম: বেশি → কম",
-        filterPrice: "দামের সীমা",
-        clear: "রিসেট",
-        freeShipHint: "আর যোগ করুন ফ্রি ডেলিভারির জন্য",
         policies: "নীতিমালা",
         quickLinks: "লিংক",
         about: "আমাদের সম্পর্কে",
@@ -191,12 +147,13 @@
         privacy: "প্রাইভেসি",
         terms: "শর্তাবলী",
         support: "সাপোর্ট",
-        messengerCheckout: "Messenger দিয়ে অর্ডার করুন",
-        copied: "কপি হয়েছে!",
-        copyOrder: "অর্ডার টেক্সট কপি",
-        openMessenger: "Messenger খুলুন",
-        loading: "পণ্য লোড হচ্ছে…",
-        loadFail: "পণ্য লোড হয়নি। data/products.json চেক করুন",
+        clear: "রিসেট",
+        sortBy: "সাজান",
+        sortPopular: "জনপ্রিয়",
+        sortLowHigh: "দাম: কম → বেশি",
+        sortHighLow: "দাম: বেশি → কম",
+        filterPrice: "দামের সীমা",
+        freeShipHint: "ফ্রি ডেলিভারির জন্য আর যোগ করুন",
       }
     };
 
@@ -222,9 +179,9 @@
       const [coupon, setCoupon] = useState("");
       const [appliedCoupon, setAppliedCoupon] = useState(null);
 
-      const [order, setOrder] = useState(null); // {id, items, total, message}
+      const [order, setOrder] = useState(null);
+      const [copied, setCopied] = useState(false);
 
-      // Load products from Decap-managed JSON
       useEffect(() => {
         (async () => {
           try {
@@ -233,8 +190,6 @@
             const res = await fetch("/data/products.json", { cache: "no-store" });
             if (!res.ok) throw new Error("HTTP " + res.status);
             const data = await res.json();
-            // Decap config stores {products:[...]} OR direct array based on widget.
-            // Our config uses fields -> products list inside JSON file.
             const list = Array.isArray(data) ? data : (data.products || []);
             setProducts(list);
           } catch (e) {
@@ -258,26 +213,26 @@
         { id: 'health',     name: {en:'Health', bn:'হেলথ'}, icon: '🏥' },
       ]), []);
 
-      // Cart logic (block out-of-stock)
-      const addToCart = (product, qty=1) => {
-        if ((product.stock ?? 0) <= 0) return;
+      const addToCart = (p, qty=1) => {
+        if ((p.stock ?? 0) <= 0) return;
         setCart(prev => {
-          const existing = prev.find(i => i.id === product.id);
-          const maxAdd = Math.max(0, Math.min(qty, (product.stock ?? 0)));
+          const existing = prev.find(i => i.id === p.id);
+          const maxStock = p.stock ?? 9999;
+          const addQty = Math.max(1, Math.min(qty, maxStock));
           if (existing) {
-            const newQty = Math.min(existing.quantity + maxAdd, (product.stock ?? 0));
-            return prev.map(i => i.id === product.id ? {...i, quantity: newQty} : i);
+            const newQty = Math.min(existing.quantity + addQty, maxStock);
+            return prev.map(i => i.id === p.id ? {...i, quantity: newQty} : i);
           }
-          return [...prev, {...product, quantity: maxAdd}];
+          return [...prev, {...p, quantity: addQty}];
         });
       };
 
-      const removeFromCart = (productId) => setCart(prev => prev.filter(i => i.id !== productId));
+      const removeFromCart = (id) => setCart(prev => prev.filter(i => i.id !== id));
 
-      const updateQuantity = (productId, change) => {
+      const updateQuantity = (id, change) => {
         setCart(prev => prev
           .map(i => {
-            if (i.id !== productId) return i;
+            if (i.id !== id) return i;
             const maxStock = i.stock ?? 9999;
             const q = Math.min(Math.max(i.quantity + change, 0), maxStock);
             return {...i, quantity: q};
@@ -286,22 +241,15 @@
         );
       };
 
-      const toggleWishlist = (product) => {
-        setWishlist(prev => {
-          const exists = prev.some(i => i.id === product.id);
-          return exists ? prev.filter(i => i.id !== product.id) : [...prev, product];
-        });
+      const toggleWishlist = (p) => {
+        setWishlist(prev => prev.some(x => x.id === p.id) ? prev.filter(x => x.id !== p.id) : [...prev, p]);
       };
 
-      const cartTotal = useMemo(() => cart.reduce((sum, i) => sum + (i.price || 0) * i.quantity, 0), [cart]);
-      const cartCount = useMemo(() => cart.reduce((sum, i) => sum + i.quantity, 0), [cart]);
+      const cartTotal = useMemo(() => cart.reduce((s, i) => s + (i.price || 0) * i.quantity, 0), [cart]);
+      const cartCount = useMemo(() => cart.reduce((s, i) => s + i.quantity, 0), [cart]);
 
-      // Delivery rules
-      const FREE_SHIP_THRESHOLD = 500;
-      const DELIVERY_FEE = 60;
-      const deliveryFee = cartTotal >= FREE_SHIP_THRESHOLD || cartTotal === 0 ? 0 : DELIVERY_FEE;
+      const deliveryFee = cartTotal >= BRAND.freeShipThreshold || cartTotal === 0 ? 0 : BRAND.deliveryFee;
 
-      // Coupon (optional demo)
       const couponDiscount = useMemo(() => {
         if (!appliedCoupon) return 0;
         if (appliedCoupon.code === "SB10") return Math.floor(cartTotal * 0.10);
@@ -311,7 +259,6 @@
 
       const grandTotal = Math.max(0, cartTotal + deliveryFee - couponDiscount);
 
-      // Filtering + sorting
       const filteredProducts = useMemo(() => {
         let list = [...products];
 
@@ -332,9 +279,6 @@
         return list;
       }, [products, selectedCategory, searchQuery, minPrice, maxPrice, sort]);
 
-      const goProduct = (p) => { setSelectedProduct(p); setPage("product"); };
-
-      // Coupon apply
       const applyCoupon = () => {
         const code = (coupon || "").trim().toUpperCase();
         if (!code) return;
@@ -344,35 +288,8 @@
 
       const clearFilters = () => {
         setSort("popular");
-        setMinPrice("");
-        setMaxPrice("");
-        setSearchQuery("");
-        setSelectedCategory("all");
-      };
-
-      // Build order message for Messenger (copy/paste)
-      const buildOrderMessage = ({ orderId, items, total }) => {
-        const lines = [];
-        lines.push("Shohoz Bazar Order");
-        lines.push(`Page ID: ${PAGE_ID}`);
-        lines.push(`Order ID: ${orderId}`);
-        lines.push("---- Items ----");
-        items.forEach(it => {
-          lines.push(
-            `• ${it.name_en || ""} / ${it.name_bn || ""} | ID: ${it.id} | Qty: ${it.quantity} | Price: ${it.price} | Subtotal: ${it.price * it.quantity}`
-          );
-        });
-        lines.push("---- Totals ----");
-        lines.push(`Subtotal: ${cartTotal}`);
-        lines.push(`Delivery: ${deliveryFee}`);
-        if (couponDiscount > 0) lines.push(`Discount: -${couponDiscount}`);
-        lines.push(`Grand Total: ${total}`);
-        lines.push("");
-        lines.push("Name:");
-        lines.push("Phone:");
-        lines.push("Address:");
-        lines.push("Payment: COD / bKash / Nagad");
-        return lines.join("\n");
+        setMinPrice(""); setMaxPrice("");
+        setSearchQuery(""); setSelectedCategory("all");
       };
 
       const copyText = async (text) => {
@@ -380,7 +297,6 @@
           await navigator.clipboard.writeText(text);
           return true;
         } catch {
-          // fallback
           const ta = document.createElement("textarea");
           ta.value = text;
           document.body.appendChild(ta);
@@ -391,135 +307,64 @@
         }
       };
 
-      const [copied, setCopied] = useState(false);
+      const buildOrderMessage = (orderId) => {
+        const lines = [];
+        lines.push(`Shohoz Bazar Order`);
+        lines.push(`Page: m.me/${BRAND.pageId}`);
+        lines.push(`Order ID: ${orderId}`);
+        lines.push(``);
+        lines.push(`Items:`);
+        cart.forEach(it => {
+          lines.push(`- ${it.name_en || ""} / ${it.name_bn || ""} (ID: ${it.id}) x${it.quantity} = ${it.price * it.quantity}`);
+        });
+        lines.push(``);
+        lines.push(`Subtotal: ${cartTotal}`);
+        lines.push(`Delivery: ${deliveryFee}`);
+        if (couponDiscount > 0) lines.push(`Discount: -${couponDiscount}`);
+        lines.push(`Grand Total: ${grandTotal}`);
+        lines.push(``);
+        lines.push(`Customer Name:`);
+        lines.push(`Phone:`);
+        lines.push(`Address:`);
+        lines.push(`Payment: COD / bKash / Nagad`);
+        return lines.join("\n");
+      };
 
       const messengerCheckout = async () => {
         if (cart.length === 0) return;
-
-        const orderId = genOrderId();
-        const message = buildOrderMessage({ orderId, items: cart, total: grandTotal });
-
+        const id = genOrderId();
+        const message = buildOrderMessage(id);
         await copyText(message);
+
         setCopied(true);
         setTimeout(() => setCopied(false), 1500);
 
-        setOrder({ id: orderId, items: cart, total: grandTotal, message });
-        // keep cart (optional) or clear cart - your choice:
-        // setCart([]);
-        window.open(MESSENGER_LINK, "_blank");
+        setOrder({ id, message, total: grandTotal, items: cart });
+        window.open(BRAND.messengerLink, "_blank");
         setPage("track");
       };
 
-      // UI components
       const ProductImage = ({ src, alt }) => {
-        if (!src) return <div className="text-6xl">🛍️</div>;
-        // If admin uploaded an image, it will be a URL like /uploads/xxx.png
-        return <img src={src} alt={alt} className="w-full h-full object-cover" />;
+        if (!src) return <div className="w-full h-full flex items-center justify-center text-5xl">🛍️</div>;
+        return <img src={src} alt={alt || ""} className="w-full h-full object-cover" loading="lazy" />;
       };
 
-      const ProductCard = ({ product }) => {
-        const isWished = wishlist.some(w => w.id === product.id);
-        const out = (product.stock ?? 0) <= 0;
-
-        return (
-          <div className={`bg-white rounded-xl shadow-sm hover:shadow-lg transition overflow-hidden ${out ? "opacity-80" : ""}`}>
-            <div
-              className="relative aspect-square bg-gray-100 flex items-center justify-center cursor-pointer overflow-hidden"
-              onClick={() => goProduct(product)}
-            >
-              <ProductImage src={product.image} alt={product.name_en} />
-
-              {product.discount > 0 && !out && (
-                <div className="absolute top-2 left-2 bg-red-500 text-white px-2 py-1 rounded-lg text-xs font-bold">
-                  -{product.discount}%
-                </div>
-              )}
-
-              {out && (
-                <div className="absolute inset-0 bg-black/45 flex items-center justify-center">
-                  <div className="bg-white text-gray-900 px-4 py-2 rounded-xl font-extrabold">
-                    {t.outOfStock}
-                  </div>
-                </div>
-              )}
-
-              <button
-                onClick={(e) => { e.stopPropagation(); toggleWishlist(product); }}
-                className="absolute top-2 right-2 p-2 bg-white/90 rounded-full shadow hover:bg-white"
-                aria-label="wishlist"
-              >
-                <span className={isWished ? "text-red-500" : ""}>{isWished ? "❤️" : "🤍"}</span>
-              </button>
-            </div>
-
-            <div className="p-4">
-              <h3
-                className="font-semibold text-sm line-clamp-2 cursor-pointer hover:text-emerald-600"
-                onClick={() => goProduct(product)}
-              >
-                {lang === "bn" ? (product.name_bn || product.name_en) : (product.name_en || product.name_bn)}
-              </h3>
-
-              <div className="flex items-center gap-1 mt-2">
-                <span>⭐</span>
-                <span className="text-sm font-semibold">{product.rating ?? 4.5}</span>
-                <span className="text-xs text-gray-500">({product.reviews ?? 0} {t.reviews})</span>
-              </div>
-
-              <div className="flex items-center gap-2 mt-2">
-                <span className="text-lg font-bold text-emerald-600">{formatBDT(product.price)}</span>
-                {product.oldPrice ? (
-                  <span className="text-sm text-gray-400 line-through">{formatBDT(product.oldPrice)}</span>
-                ) : null}
-              </div>
-
-              <div className="text-xs text-gray-600 mt-2">
-                🚚 {t.delivery}: {product.delivery || "1-2 days"}
-              </div>
-
-              {!out && (product.stock ?? 0) < 20 && (
-                <div className="text-xs text-red-600 mt-2">⚠️ {t.onlyLeft}: {product.stock}</div>
-              )}
-
-              <div className="mt-3 grid grid-cols-2 gap-2">
-                <button
-                  disabled={out}
-                  onClick={() => addToCart(product, 1)}
-                  className={`w-full py-2 rounded-lg font-semibold ${
-                    out ? "bg-gray-200 text-gray-500 cursor-not-allowed" : "bg-orange-500 hover:bg-orange-600 text-white"
-                  }`}
-                >
-                  {t.addToCart}
-                </button>
-                <button
-                  onClick={() => goProduct(product)}
-                  className="w-full border border-gray-300 hover:border-emerald-600 py-2 rounded-lg font-semibold"
-                >
-                  {t.viewDetails}
-                </button>
-              </div>
-            </div>
-          </div>
-        );
-      };
+      const goProduct = (p) => { setSelectedProduct(p); setPage("product"); };
 
       const Header = () => (
-        <header className="sticky top-0 z-50 bg-white shadow-sm">
-          <div className="bg-emerald-600 text-white py-2 px-4 text-sm text-center">
-            🎉 Flash Sale | Free Delivery on orders above {formatBDT(FREE_SHIP_THRESHOLD)} | Messenger Checkout
+        <header className="sticky top-0 z-50 bg-white/90 backdrop-blur border-b">
+          <div className="bg-emerald-700 text-white py-2 px-4 text-sm text-center">
+            💬 Messenger Checkout • Free Delivery over {formatBDT(BRAND.freeShipThreshold)}
           </div>
 
-          <div className="container mx-auto px-4 py-3">
+          <div className="container mx-auto px-4 py-4">
             <div className="flex items-center justify-between gap-4">
-              <div
-                className="flex items-center gap-3 cursor-pointer"
-                onClick={() => { setPage("home"); setSelectedProduct(null); }}
-              >
-                <div className="w-10 h-10 rounded-xl overflow-hidden bg-white border flex items-center justify-center">
-                  <img src="SB logoM.png" alt="Shohoz Bazar" className="w-full h-full object-contain" />
+              <div className="flex items-center gap-3 cursor-pointer" onClick={() => { setPage("home"); setSelectedProduct(null); }}>
+                <div className="w-11 h-11 rounded-2xl overflow-hidden bg-white border flex items-center justify-center shadow-sm">
+                  <img src={BRAND.logo} alt={BRAND.name} className="w-full h-full object-contain" />
                 </div>
                 <div>
-                  <div className="font-extrabold text-lg text-emerald-700">Shohoz Bazar</div>
+                  <div className="font-extrabold text-lg text-gray-900 leading-tight">{BRAND.name}</div>
                   <div className="text-xs text-gray-500 hidden sm:block">{t.tagline}</div>
                 </div>
               </div>
@@ -529,7 +374,7 @@
                   <input
                     type="text"
                     placeholder={t.searchPlaceholder}
-                    className="w-full px-4 py-3 pr-12 border-2 border-gray-200 rounded-xl focus:border-emerald-500 focus:outline-none"
+                    className="w-full px-4 py-3 pr-12 border border-gray-200 rounded-2xl focus:border-emerald-500 focus:outline-none bg-white"
                     value={searchQuery}
                     onChange={(e) => { setSearchQuery(e.target.value); setPage("shop"); }}
                   />
@@ -537,16 +382,16 @@
                 </div>
               </div>
 
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-2">
                 <button
-                  className="px-3 py-2 rounded-lg hover:bg-gray-100"
+                  className="px-3 py-2 rounded-xl border border-gray-200 hover:border-emerald-400 bg-white"
                   onClick={() => setLang(prev => prev === "bn" ? "en" : "bn")}
                   title="Toggle language"
                 >
-                  <span className="text-sm font-semibold">{lang === "bn" ? "EN" : "BN"}</span>
+                  <span className="text-sm font-bold">{lang === "bn" ? "EN" : "BN"}</span>
                 </button>
 
-                <button className="relative px-3 py-2 rounded-lg hover:bg-gray-100" onClick={() => setPage("wishlist")}>
+                <button className="relative px-3 py-2 rounded-xl hover:bg-gray-100" onClick={() => setPage("wishlist")}>
                   <span className="text-xl">❤️</span>
                   {wishlist.length > 0 && (
                     <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center">
@@ -555,7 +400,7 @@
                   )}
                 </button>
 
-                <button className="relative px-3 py-2 rounded-lg hover:bg-gray-100" onClick={() => setPage("cart")}>
+                <button className="relative px-3 py-2 rounded-xl hover:bg-gray-100" onClick={() => setPage("cart")}>
                   <span className="text-xl">🛒</span>
                   {cartCount > 0 && (
                     <span className="absolute -top-1 -right-1 bg-emerald-600 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center">
@@ -571,7 +416,7 @@
                 <input
                   type="text"
                   placeholder={t.searchPlaceholder}
-                  className="w-full px-4 py-2 pr-10 border-2 border-gray-200 rounded-xl focus:border-emerald-500 focus:outline-none"
+                  className="w-full px-4 py-2 pr-10 border border-gray-200 rounded-2xl focus:border-emerald-500 focus:outline-none bg-white"
                   value={searchQuery}
                   onChange={(e) => { setSearchQuery(e.target.value); setPage("shop"); }}
                 />
@@ -580,19 +425,19 @@
             </div>
           </div>
 
-          <div className="border-t overflow-x-auto">
+          <div className="border-t overflow-x-auto bg-white">
             <div className="container mx-auto px-4">
-              <div className="flex gap-3 py-3 whitespace-nowrap">
+              <div className="flex gap-2 py-3 whitespace-nowrap">
                 {categories.map(cat => (
                   <button
                     key={cat.id}
                     onClick={() => { setSelectedCategory(cat.id); setPage("shop"); }}
-                    className={`flex items-center gap-2 px-4 py-2 rounded-full transition ${
-                      selectedCategory === cat.id ? "bg-emerald-600 text-white" : "bg-gray-100 hover:bg-gray-200"
+                    className={`flex items-center gap-2 px-4 py-2 rounded-full transition font-semibold ${
+                      selectedCategory === cat.id ? "bg-emerald-700 text-white" : "bg-gray-100 hover:bg-gray-200 text-gray-800"
                     }`}
                   >
                     <span>{cat.icon}</span>
-                    <span className="text-sm font-semibold">{cat.name[lang]}</span>
+                    <span className="text-sm">{cat.name[lang]}</span>
                   </button>
                 ))}
               </div>
@@ -601,127 +446,145 @@
         </header>
       );
 
-      const Footer = () => (
-        <footer className="bg-gray-900 text-white mt-16">
-          <div className="container mx-auto px-4 py-12">
-            <div className="grid md:grid-cols-4 gap-8">
-              <div>
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="w-10 h-10 rounded-xl overflow-hidden bg-white border flex items-center justify-center">
-                    <img src="SB logoM.png" alt="Shohoz Bazar" className="w-full h-full object-contain" />
-                  </div>
-                  <h3 className="font-bold text-lg">Shohoz Bazar</h3>
+      const ProductCard = ({ product }) => {
+        const isWished = wishlist.some(w => w.id === product.id);
+        const out = (product.stock ?? 0) <= 0;
+
+        const title = lang === "bn"
+          ? (product.name_bn || product.name_en || "")
+          : (product.name_en || product.name_bn || "");
+
+        return (
+          <div className={`bg-white rounded-2xl shadow-sm hover:shadow-md transition overflow-hidden border ${out ? "opacity-80" : ""}`}>
+            <div className="relative aspect-square bg-gray-100 overflow-hidden cursor-pointer" onClick={() => goProduct(product)}>
+              <ProductImage src={product.image} alt={title} />
+
+              {product.discount > 0 && !out && (
+                <div className="absolute top-3 left-3 bg-red-500 text-white px-2 py-1 rounded-xl text-xs font-extrabold">
+                  -{product.discount}%
                 </div>
-                <p className="text-gray-400 text-sm mb-4">
-                  Bangladesh marketplace — browse, add to cart, and checkout via Messenger (no gateway).
-                </p>
-                <a href={MESSENGER_LINK} target="_blank" className="inline-block bg-emerald-700 hover:bg-emerald-600 px-4 py-2 rounded-xl font-bold">
-                  Messenger: m.me/{PAGE_ID}
-                </a>
-              </div>
+              )}
 
-              <div>
-                <h3 className="font-bold text-lg mb-4">{t.quickLinks}</h3>
-                <ul className="space-y-2 text-sm text-gray-400">
-                  <li className="hover:text-white cursor-pointer">{t.about}</li>
-                  <li className="hover:text-white cursor-pointer">{t.contact}</li>
-                  <li className="hover:text-white cursor-pointer">{t.faq}</li>
-                </ul>
-              </div>
+              {out && (
+                <div className="absolute inset-0 bg-black/45 flex items-center justify-center">
+                  <div className="bg-white text-gray-900 px-4 py-2 rounded-2xl font-extrabold">{t.outOfStock}</div>
+                </div>
+              )}
 
-              <div>
-                <h3 className="font-bold text-lg mb-4">{t.policies}</h3>
-                <ul className="space-y-2 text-sm text-gray-400">
-                  <li className="hover:text-white cursor-pointer">{t.returnRefund}</li>
-                  <li className="hover:text-white cursor-pointer">{t.privacy}</li>
-                  <li className="hover:text-white cursor-pointer">{t.terms}</li>
-                </ul>
-              </div>
-
-              <div>
-                <h3 className="font-bold text-lg mb-4">{t.support}</h3>
-                <ul className="space-y-2 text-sm text-gray-400">
-                  <li>📞 +880 1234-567890</li>
-                  <li>📧 support@shohozbazar.com</li>
-                  <li>📍 Dhaka, Bangladesh</li>
-                </ul>
-              </div>
-            </div>
-
-            <div className="border-t border-gray-800 mt-8 pt-8 text-center text-sm text-gray-400">
-              <p>© 2025 Shohoz Bazar. All rights reserved.</p>
-            </div>
-          </div>
-        </footer>
-      );
-
-      const MobileBottomNav = () => (
-        <div className="fixed bottom-0 left-0 right-0 bg-white border-t shadow-lg md:hidden z-50">
-          <div className="grid grid-cols-4 gap-1 p-2">
-            {[
-              { icon: '🏠', label: t.home, page: 'home' },
-              { icon: '🛍️', label: t.shop, page: 'shop' },
-              { icon: '❤️', label: t.wishlist, page: 'wishlist', badge: wishlist.length },
-              { icon: '🛒', label: t.cart, page: 'cart', badge: cartCount },
-            ].map((item, i) => (
-              <button key={i} onClick={() => setPage(item.page)} className="flex flex-col items-center gap-1 py-2 relative">
-                <span className="text-xl">{item.icon}</span>
-                <span className="text-xs">{item.label}</span>
-                {item.badge > 0 && (
-                  <span className="absolute top-1 right-2 bg-red-500 text-white text-xs w-4 h-4 rounded-full flex items-center justify-center">
-                    {item.badge}
-                  </span>
-                )}
+              <button
+                onClick={(e) => { e.stopPropagation(); toggleWishlist(product); }}
+                className="absolute top-3 right-3 p-2 bg-white/90 rounded-full shadow hover:bg-white"
+                aria-label="wishlist"
+              >
+                <span className={isWished ? "text-red-500" : ""}>{isWished ? "❤️" : "🤍"}</span>
               </button>
-            ))}
+            </div>
+
+            <div className="p-4">
+              <h3 className="font-extrabold text-sm line-clamp-2 cursor-pointer hover:text-emerald-700" onClick={() => goProduct(product)}>
+                {title}
+              </h3>
+
+              <div className="flex items-center gap-2 mt-2 text-sm text-gray-700">
+                <span>⭐</span>
+                <span className="font-bold">{product.rating ?? 4.5}</span>
+                <span className="text-gray-500">({product.reviews ?? 0} {t.reviews})</span>
+              </div>
+
+              <div className="flex items-center gap-2 mt-2">
+                <span className="text-lg font-extrabold text-emerald-700">{formatBDT(product.price)}</span>
+                {product.oldPrice ? <span className="text-sm text-gray-400 line-through">{formatBDT(product.oldPrice)}</span> : null}
+              </div>
+
+              <div className="text-xs text-gray-600 mt-2">
+                🚚 {t.delivery}: {product.delivery || "1-2 days"}
+              </div>
+
+              {!out && (product.stock ?? 0) < 20 && (
+                <div className="text-xs text-red-600 mt-2">⚠️ {t.onlyLeft}: {product.stock}</div>
+              )}
+
+              <div className="mt-3 grid grid-cols-2 gap-2">
+                <button
+                  disabled={out}
+                  onClick={() => addToCart(product, 1)}
+                  className={`w-full py-2 rounded-xl font-extrabold ${
+                    out ? "bg-gray-200 text-gray-500 cursor-not-allowed" : "bg-orange-500 hover:bg-orange-600 text-white"
+                  }`}
+                >
+                  {t.addToCart}
+                </button>
+
+                <button
+                  onClick={() => goProduct(product)}
+                  className="w-full py-2 rounded-xl font-extrabold border border-gray-200 hover:border-emerald-400"
+                >
+                  {t.viewDetails}
+                </button>
+              </div>
+            </div>
           </div>
-        </div>
-      );
+        );
+      };
 
       const HomePage = () => (
         <div>
-          <div className="bg-gradient-to-r from-emerald-500 to-emerald-700 text-white py-16 px-4">
-            <div className="container mx-auto text-center">
-              <h1 className="text-4xl md:text-5xl font-extrabold mb-4">{t.heroTitle}</h1>
-              <p className="text-xl mb-8">{t.heroSubtitle}</p>
-              <button
-                onClick={() => setPage("shop")}
-                className="bg-orange-500 hover:bg-orange-600 text-white px-8 py-3 rounded-xl text-lg font-bold transition"
-              >
-                {t.shopNow}
-              </button>
+          <div className="bg-gradient-to-br from-emerald-700 via-emerald-600 to-emerald-500 text-white">
+            <div className="container mx-auto px-4 py-14 md:py-20">
+              <div className="max-w-3xl">
+                <div className="inline-flex items-center gap-2 bg-white/15 border border-white/20 px-4 py-2 rounded-full text-sm font-bold mb-5">
+                  💬 Messenger Checkout • No payment gateway
+                </div>
+                <h1 className="text-4xl md:text-5xl font-black leading-tight">{t.heroTitle}</h1>
+                <p className="text-white/90 text-lg md:text-xl mt-4">{t.heroSubtitle}</p>
+                <div className="mt-8 flex gap-3 flex-wrap">
+                  <button
+                    onClick={() => setPage("shop")}
+                    className="bg-orange-500 hover:bg-orange-600 text-white px-7 py-3 rounded-2xl text-lg font-black transition"
+                  >
+                    {t.shopNow}
+                  </button>
+                  <a
+                    href={BRAND.messengerLink}
+                    target="_blank"
+                    className="bg-white/15 hover:bg-white/20 border border-white/30 px-7 py-3 rounded-2xl text-lg font-black"
+                  >
+                    m.me/{BRAND.pageId}
+                  </a>
+                </div>
+              </div>
             </div>
           </div>
 
-          <div className="container mx-auto px-4 py-8">
+          <div className="container mx-auto px-4 py-10">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               {[
-                { icon: "💬", title: "Messenger Checkout", sub: "No payment gateway needed" },
-                { icon: "🧑‍💻", title: "Free Admin Panel", sub: "/admin using Netlify + Decap" },
-                { icon: "🛍️", title: "Dynamic Products", sub: "Update products anytime" },
-                { icon: "🚚", title: "Delivery Rules", sub: "Free shipping threshold" },
+                { icon: "💬", title: "Messenger Checkout", sub: "Copy & paste order instantly" },
+                { icon: "🧑‍💻", title: "Free Admin Panel", sub: "/admin with Decap CMS" },
+                { icon: "🛍️", title: "Dynamic Products", sub: "Manage stock & price anytime" },
+                { icon: "🚚", title: "Smart Delivery", sub: "Free shipping threshold" },
               ].map((b, i) => (
-                <div key={i} className="bg-white p-6 rounded-xl shadow-sm text-center">
-                  <div className="text-5xl mb-3">{b.icon}</div>
-                  <h3 className="font-semibold mb-1">{b.title}</h3>
-                  <p className="text-sm text-gray-600">{b.sub}</p>
+                <div key={i} className="bg-white p-6 rounded-2xl shadow-sm border">
+                  <div className="text-4xl">{b.icon}</div>
+                  <div className="mt-3 font-black text-gray-900">{b.title}</div>
+                  <div className="text-sm text-gray-600 mt-1">{b.sub}</div>
                 </div>
               ))}
             </div>
           </div>
 
-          <div className="container mx-auto px-4 mb-12">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-3xl font-extrabold">🔥 {t.topDeals}</h2>
-              <button className="text-emerald-700 font-semibold hover:underline" onClick={() => setPage("shop")}>
+          <div className="container mx-auto px-4 pb-12">
+            <div className="flex items-center justify-between gap-4 mb-6">
+              <h2 className="text-2xl md:text-3xl font-black">🔥 {t.topDeals}</h2>
+              <button className="text-emerald-700 font-black hover:underline" onClick={() => setPage("shop")}>
                 {t.shop} →
               </button>
             </div>
 
             {loading ? (
-              <div className="bg-white rounded-2xl p-8 text-center shadow-sm">{t.loading}</div>
+              <div className="bg-white rounded-2xl p-10 text-center shadow-sm border">{t.loading}</div>
             ) : loadError ? (
-              <div className="bg-white rounded-2xl p-8 text-center shadow-sm text-red-600">{loadError}</div>
+              <div className="bg-white rounded-2xl p-10 text-center shadow-sm border text-red-600">{loadError}</div>
             ) : (
               <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
                 {products.slice(0, 6).map(p => <ProductCard key={p.id} product={p} />)}
@@ -735,18 +598,14 @@
         <div className="container mx-auto px-4 py-8">
           <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-4 mb-6">
             <div>
-              <h1 className="text-3xl font-extrabold mb-1">
-                {selectedCategory === "all"
-                  ? t.allProducts
-                  : (categories.find(c => c.id === selectedCategory)?.name[lang] || t.allProducts)}
-              </h1>
-              <p className="text-gray-600">{filteredProducts.length} {t.productsFound}</p>
+              <h1 className="text-2xl md:text-3xl font-black">{t.allProducts}</h1>
+              <p className="text-gray-600 mt-1">{filteredProducts.length} {t.productsFound}</p>
             </div>
 
             <div className="flex flex-wrap gap-3 items-center">
               <div className="flex items-center gap-2">
-                <span className="text-sm text-gray-600">{t.sortBy}</span>
-                <select value={sort} onChange={(e) => setSort(e.target.value)} className="border rounded-lg px-3 py-2 bg-white">
+                <span className="text-sm text-gray-600 font-bold">{t.sortBy}</span>
+                <select value={sort} onChange={(e) => setSort(e.target.value)} className="border rounded-xl px-3 py-2 bg-white">
                   <option value="popular">{t.sortPopular}</option>
                   <option value="lowhigh">{t.sortLowHigh}</option>
                   <option value="highlow">{t.sortHighLow}</option>
@@ -754,21 +613,21 @@
               </div>
 
               <div className="flex items-center gap-2">
-                <span className="text-sm text-gray-600">{t.filterPrice}</span>
-                <input type="number" value={minPrice} onChange={(e) => setMinPrice(e.target.value)} placeholder="min" className="w-24 border rounded-lg px-3 py-2" />
-                <input type="number" value={maxPrice} onChange={(e) => setMaxPrice(e.target.value)} placeholder="max" className="w-24 border rounded-lg px-3 py-2" />
+                <span className="text-sm text-gray-600 font-bold">{t.filterPrice}</span>
+                <input type="number" value={minPrice} onChange={(e) => setMinPrice(e.target.value)} placeholder="min" className="w-24 border rounded-xl px-3 py-2" />
+                <input type="number" value={maxPrice} onChange={(e) => setMaxPrice(e.target.value)} placeholder="max" className="w-24 border rounded-xl px-3 py-2" />
               </div>
 
-              <button onClick={clearFilters} className="px-4 py-2 rounded-lg border hover:border-emerald-600 font-semibold">
+              <button onClick={clearFilters} className="px-4 py-2 rounded-xl border font-black hover:border-emerald-400">
                 {t.clear}
               </button>
             </div>
           </div>
 
           {loading ? (
-            <div className="bg-white rounded-2xl p-8 text-center shadow-sm">{t.loading}</div>
+            <div className="bg-white rounded-2xl p-10 text-center shadow-sm border">{t.loading}</div>
           ) : loadError ? (
-            <div className="bg-white rounded-2xl p-8 text-center shadow-sm text-red-600">{loadError}</div>
+            <div className="bg-white rounded-2xl p-10 text-center shadow-sm border text-red-600">{loadError}</div>
           ) : (
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
               {filteredProducts.map(p => <ProductCard key={p.id} product={p} />)}
@@ -782,8 +641,8 @@
         if (!p) return (
           <div className="container mx-auto px-4 py-12 text-center">
             <div className="text-6xl mb-4">😅</div>
-            <p className="font-semibold">No product selected.</p>
-            <button className="mt-4 bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-3 rounded-xl font-bold"
+            <p className="font-bold">No product selected.</p>
+            <button className="mt-4 bg-emerald-700 hover:bg-emerald-800 text-white px-6 py-3 rounded-2xl font-black"
               onClick={() => setPage("shop")}
             >
               {t.shop}
@@ -791,41 +650,44 @@
           </div>
         );
 
-        const isWished = wishlist.some(w => w.id === p.id);
         const out = (p.stock ?? 0) <= 0;
+        const title = lang === "bn" ? (p.name_bn || p.name_en || "") : (p.name_en || p.name_bn || "");
+        const desc = lang === "bn" ? (p.description_bn || "") : (p.description_en || "");
 
         return (
           <div className="container mx-auto px-4 py-8">
-            <button className="mb-4 text-emerald-700 font-semibold hover:underline" onClick={() => setPage("shop")}>
+            <button className="mb-5 text-emerald-700 font-black hover:underline" onClick={() => setPage("shop")}>
               ← {t.shop}
             </button>
 
             <div className="grid md:grid-cols-2 gap-8">
-              <div className="bg-white rounded-2xl shadow-sm p-0 overflow-hidden aspect-square">
-                <ProductImage src={p.image} alt={p.name_en} />
+              <div className="bg-white rounded-3xl shadow-sm border overflow-hidden aspect-square">
+                <ProductImage src={p.image} alt={title} />
               </div>
 
-              <div className="bg-white rounded-2xl shadow-sm p-6">
+              <div className="bg-white rounded-3xl shadow-sm border p-6">
                 <div className="flex items-start justify-between gap-3">
-                  <h1 className="text-2xl md:text-3xl font-extrabold">
-                    {lang === "bn" ? (p.name_bn || p.name_en) : (p.name_en || p.name_bn)}
-                  </h1>
-                  <button onClick={() => toggleWishlist(p)} className="px-3 py-2 rounded-xl border hover:border-emerald-600" title="Wishlist">
-                    {isWished ? "❤️" : "🤍"}
+                  <h1 className="text-2xl md:text-3xl font-black">{title}</h1>
+                  <button
+                    onClick={() => toggleWishlist(p)}
+                    className="px-3 py-2 rounded-2xl border hover:border-emerald-400"
+                    title="Wishlist"
+                  >
+                    {wishlist.some(w => w.id === p.id) ? "❤️" : "🤍"}
                   </button>
                 </div>
 
-                <div className="flex items-center gap-2 mt-3">
+                <div className="flex items-center gap-2 mt-3 text-gray-700">
                   <span>⭐</span>
-                  <span className="font-semibold">{p.rating ?? 4.5}</span>
+                  <span className="font-black">{p.rating ?? 4.5}</span>
                   <span className="text-sm text-gray-500">({p.reviews ?? 0} {t.reviews})</span>
                 </div>
 
                 <div className="flex items-center gap-3 mt-4">
-                  <span className="text-3xl font-extrabold text-emerald-700">{formatBDT(p.price)}</span>
+                  <span className="text-3xl font-black text-emerald-700">{formatBDT(p.price)}</span>
                   {p.oldPrice ? <span className="text-gray-400 line-through">{formatBDT(p.oldPrice)}</span> : null}
                   {p.discount > 0 && !out ? (
-                    <span className="bg-red-50 text-red-600 border border-red-200 px-3 py-1 rounded-full font-bold text-sm">
+                    <span className="bg-red-50 text-red-600 border border-red-200 px-3 py-1 rounded-full font-black text-sm">
                       -{p.discount}%
                     </span>
                   ) : null}
@@ -833,16 +695,17 @@
 
                 <div className="mt-4 text-sm text-gray-700">
                   <div className="flex items-center gap-2">
-                    {out ? "⛔" : "✅"} <span>{out ? t.outOfStock : `${t.inStock}: ${p.stock}`}</span>
+                    {out ? "⛔" : "✅"} <span className="font-bold">{out ? t.outOfStock : `${t.inStock}: ${p.stock}`}</span>
                   </div>
                   <div className="flex items-center gap-2 mt-1">🚚 <span>{t.delivery}: {p.delivery || "1-2 days"}</span></div>
+                  <div className="flex items-center gap-2 mt-1">🆔 <span>ID: {p.id}</span></div>
                 </div>
 
                 <div className="mt-6 flex gap-3">
                   <button
                     disabled={out}
                     onClick={() => addToCart(p, 1)}
-                    className={`flex-1 py-3 rounded-xl font-extrabold ${
+                    className={`flex-1 py-3 rounded-2xl font-black ${
                       out ? "bg-gray-200 text-gray-500 cursor-not-allowed" : "bg-orange-500 hover:bg-orange-600 text-white"
                     }`}
                   >
@@ -851,20 +714,20 @@
                   <button
                     disabled={out}
                     onClick={() => { addToCart(p, 1); setPage("cart"); }}
-                    className={`flex-1 py-3 rounded-xl font-extrabold ${
-                      out ? "bg-gray-200 text-gray-500 cursor-not-allowed" : "bg-emerald-600 hover:bg-emerald-700 text-white"
+                    className={`flex-1 py-3 rounded-2xl font-black ${
+                      out ? "bg-gray-200 text-gray-500 cursor-not-allowed" : "bg-emerald-700 hover:bg-emerald-800 text-white"
                     }`}
                   >
-                    {t.viewDetails}
+                    {t.cart}
                   </button>
                 </div>
 
-                <div className="mt-6 border-t pt-4">
-                  <h3 className="font-extrabold mb-2">Details</h3>
-                  <p className="text-sm text-gray-700">
-                    {lang === "bn" ? (p.description_bn || "") : (p.description_en || "")}
-                  </p>
-                </div>
+                {desc ? (
+                  <div className="mt-6 border-t pt-4">
+                    <div className="font-black mb-2">Details</div>
+                    <p className="text-sm text-gray-700 leading-relaxed">{desc}</p>
+                  </div>
+                ) : null}
               </div>
             </div>
           </div>
@@ -874,8 +737,8 @@
       const CartPage = () => (
         <div className="container mx-auto px-4 py-8">
           <div className="flex items-center justify-between flex-wrap gap-3">
-            <h1 className="text-3xl font-extrabold">{t.cart} ({cartCount})</h1>
-            <button className="text-emerald-700 font-semibold hover:underline" onClick={() => setPage("shop")}>
+            <h1 className="text-2xl md:text-3xl font-black">{t.cart} ({cartCount})</h1>
+            <button className="text-emerald-700 font-black hover:underline" onClick={() => setPage("shop")}>
               {t.continueShopping} →
             </button>
           </div>
@@ -883,9 +746,9 @@
           {cart.length === 0 ? (
             <div className="text-center py-16">
               <div className="text-8xl mb-4">🛒</div>
-              <h2 className="text-2xl font-semibold mb-2">{t.emptyCartTitle}</h2>
+              <h2 className="text-2xl font-black mb-2">{t.emptyCartTitle}</h2>
               <p className="text-gray-600 mb-6">{t.emptyCartSubtitle}</p>
-              <button onClick={() => setPage("shop")} className="bg-emerald-600 hover:bg-emerald-700 text-white px-8 py-3 rounded-xl font-bold">
+              <button onClick={() => setPage("shop")} className="bg-emerald-700 hover:bg-emerald-800 text-white px-8 py-3 rounded-2xl font-black">
                 {t.startShopping}
               </button>
             </div>
@@ -893,30 +756,29 @@
             <div className="grid lg:grid-cols-3 gap-8 mt-6">
               <div className="lg:col-span-2 space-y-4">
                 {cart.map(item => (
-                  <div key={item.id} className="bg-white rounded-2xl shadow-sm p-4 flex gap-4">
-                    <div className="w-24 h-24 bg-gray-100 rounded-xl overflow-hidden flex-shrink-0 cursor-pointer" onClick={() => goProduct(item)}>
+                  <div key={item.id} className="bg-white rounded-3xl shadow-sm border p-4 flex gap-4">
+                    <div className="w-24 h-24 bg-gray-100 rounded-2xl overflow-hidden flex-shrink-0 cursor-pointer" onClick={() => goProduct(item)}>
                       <ProductImage src={item.image} alt={item.name_en} />
                     </div>
 
                     <div className="flex-1">
-                      <h3 className="font-bold mb-1 cursor-pointer hover:text-emerald-700" onClick={() => goProduct(item)}>
+                      <div className="font-black cursor-pointer hover:text-emerald-700" onClick={() => goProduct(item)}>
                         {lang === "bn" ? (item.name_bn || item.name_en) : (item.name_en || item.name_bn)}
-                      </h3>
-                      <div className="flex items-center gap-2">
-                        <span className="text-lg font-extrabold text-emerald-700">{formatBDT(item.price)}</span>
+                      </div>
+                      <div className="flex items-center gap-2 mt-1">
+                        <span className="text-lg font-black text-emerald-700">{formatBDT(item.price)}</span>
                         {item.oldPrice ? <span className="text-sm text-gray-400 line-through">{formatBDT(item.oldPrice)}</span> : null}
                       </div>
-                      <div className="text-xs text-gray-600 mt-1">🚚 {t.delivery}: {item.delivery || "1-2 days"}</div>
-                      <div className="text-xs text-gray-500 mt-1">ID: {item.id}</div>
+                      <div className="text-xs text-gray-600 mt-1">🆔 ID: {item.id}</div>
                     </div>
 
                     <div className="flex flex-col items-end justify-between">
                       <button onClick={() => removeFromCart(item.id)} className="text-red-500 hover:text-red-700 text-xl">✕</button>
 
-                      <div className="flex items-center gap-2 border rounded-xl">
-                        <button onClick={() => updateQuantity(item.id, -1)} className="p-2 hover:bg-gray-100 rounded-l-xl">−</button>
-                        <span className="px-4 font-extrabold">{item.quantity}</span>
-                        <button onClick={() => updateQuantity(item.id, 1)} className="p-2 hover:bg-gray-100 rounded-r-xl">+</button>
+                      <div className="flex items-center gap-2 border rounded-2xl">
+                        <button onClick={() => updateQuantity(item.id, -1)} className="p-2 hover:bg-gray-100 rounded-l-2xl">−</button>
+                        <span className="px-4 font-black">{item.quantity}</span>
+                        <button onClick={() => updateQuantity(item.id, 1)} className="p-2 hover:bg-gray-100 rounded-r-2xl">+</button>
                       </div>
                     </div>
                   </div>
@@ -924,38 +786,35 @@
               </div>
 
               <div className="lg:col-span-1">
-                <div className="bg-white rounded-2xl shadow-sm p-6 sticky top-24">
-                  <h2 className="text-xl font-extrabold mb-4">Order Summary</h2>
+                <div className="bg-white rounded-3xl shadow-sm border p-6 sticky top-28">
+                  <div className="text-xl font-black mb-4">Order Summary</div>
 
-                  <div className="space-y-3 mb-4 text-sm">
-                    <div className="flex justify-between"><span>{t.subtotal}</span><span className="font-bold">{formatBDT(cartTotal)}</span></div>
-                    <div className="flex justify-between"><span>{t.deliveryFee}</span><span className="font-bold">{deliveryFee === 0 ? t.free : formatBDT(deliveryFee)}</span></div>
+                  <div className="space-y-3 text-sm text-gray-700 mb-4">
+                    <div className="flex justify-between"><span className="font-bold">{t.subtotal}</span><span className="font-black">{formatBDT(cartTotal)}</span></div>
+                    <div className="flex justify-between"><span className="font-bold">{t.deliveryFee}</span><span className="font-black">{deliveryFee === 0 ? t.free : formatBDT(deliveryFee)}</span></div>
 
-                    <div className="pt-2">
+                    <div>
                       <div className="flex gap-2">
-                        <input value={coupon} onChange={(e) => setCoupon(e.target.value)} placeholder={`${t.coupon} (SB10 / SHIPFREE)`} className="flex-1 border rounded-xl px-3 py-2" />
-                        <button onClick={applyCoupon} className="px-4 py-2 rounded-xl bg-gray-900 text-white font-bold">{t.apply}</button>
+                        <input value={coupon} onChange={(e) => setCoupon(e.target.value)} placeholder={`${t.coupon} (SB10 / SHIPFREE)`} className="flex-1 border rounded-2xl px-3 py-2" />
+                        <button onClick={applyCoupon} className="px-4 py-2 rounded-2xl bg-gray-900 text-white font-black">{t.apply}</button>
                       </div>
-
-                      {appliedCoupon && appliedCoupon.code === "INVALID" && (
-                        <div className="mt-2 text-red-600 text-sm">Invalid coupon</div>
-                      )}
-                      {appliedCoupon && appliedCoupon.code !== "INVALID" && (
-                        <div className="mt-2 text-emerald-700 text-sm">
-                          Applied: <span className="font-bold">{appliedCoupon.code}</span> (−{formatBDT(couponDiscount)})
-                        </div>
-                      )}
+                      {appliedCoupon && appliedCoupon.code === "INVALID" ? (
+                        <div className="mt-2 text-red-600 font-bold">Invalid coupon</div>
+                      ) : null}
+                      {appliedCoupon && appliedCoupon.code !== "INVALID" ? (
+                        <div className="mt-2 text-emerald-700 font-bold">Applied: {appliedCoupon.code} (−{formatBDT(couponDiscount)})</div>
+                      ) : null}
                     </div>
 
-                    {cartTotal < FREE_SHIP_THRESHOLD && (
-                      <div className="bg-orange-50 border border-orange-200 rounded-xl p-3 text-sm">
-                        💰 {t.freeShipHint}: {formatBDT(FREE_SHIP_THRESHOLD - cartTotal)}
+                    {cartTotal < BRAND.freeShipThreshold ? (
+                      <div className="bg-orange-50 border border-orange-200 rounded-2xl p-3 font-bold">
+                        💰 {t.freeShipHint}: {formatBDT(BRAND.freeShipThreshold - cartTotal)}
                       </div>
-                    )}
+                    ) : null}
                   </div>
 
                   <div className="border-t pt-4 mb-4">
-                    <div className="flex justify-between text-lg font-extrabold">
+                    <div className="flex justify-between text-lg font-black">
                       <span>{t.total}</span>
                       <span className="text-emerald-700">{formatBDT(grandTotal)}</span>
                     </div>
@@ -963,12 +822,12 @@
 
                   <button
                     onClick={messengerCheckout}
-                    className="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-3 rounded-xl font-extrabold text-lg transition"
+                    className="w-full bg-emerald-700 hover:bg-emerald-800 text-white py-3 rounded-2xl font-black text-lg transition"
                   >
                     {copied ? t.copied : t.messengerCheckout}
                   </button>
 
-                  <a href={MESSENGER_LINK} target="_blank" className="block text-center mt-3 text-emerald-700 font-semibold hover:underline">
+                  <a href={BRAND.messengerLink} target="_blank" className="block text-center mt-3 text-emerald-700 font-black hover:underline">
                     {t.openMessenger} →
                   </a>
                 </div>
@@ -981,8 +840,8 @@
       const WishlistPage = () => (
         <div className="container mx-auto px-4 py-8">
           <div className="flex items-center justify-between flex-wrap gap-3">
-            <h1 className="text-3xl font-extrabold">{t.wishlist} ({wishlist.length})</h1>
-            <button className="text-emerald-700 font-semibold hover:underline" onClick={() => setPage("shop")}>
+            <h1 className="text-2xl md:text-3xl font-black">{t.wishlist} ({wishlist.length})</h1>
+            <button className="text-emerald-700 font-black hover:underline" onClick={() => setPage("shop")}>
               {t.shop} →
             </button>
           </div>
@@ -990,9 +849,9 @@
           {wishlist.length === 0 ? (
             <div className="text-center py-16">
               <div className="text-8xl mb-4">❤️</div>
-              <h2 className="text-2xl font-semibold mb-2">Your wishlist is empty</h2>
+              <h2 className="text-2xl font-black mb-2">Your wishlist is empty</h2>
               <p className="text-gray-600 mb-6">Save your favorite items here!</p>
-              <button onClick={() => setPage("shop")} className="bg-emerald-600 hover:bg-emerald-700 text-white px-8 py-3 rounded-xl font-bold">
+              <button onClick={() => setPage("shop")} className="bg-emerald-700 hover:bg-emerald-800 text-white px-8 py-3 rounded-2xl font-black">
                 {t.startShopping}
               </button>
             </div>
@@ -1007,32 +866,31 @@
       const TrackPage = () => (
         <div className="container mx-auto px-4 py-8">
           <div className="flex items-center justify-between flex-wrap gap-3 mb-6">
-            <h1 className="text-3xl font-extrabold">{t.trackOrder}</h1>
-            <button className="text-emerald-700 font-semibold hover:underline" onClick={() => setPage("home")}>
+            <h1 className="text-2xl md:text-3xl font-black">{t.orderCreated}</h1>
+            <button className="text-emerald-700 font-black hover:underline" onClick={() => setPage("home")}>
               {t.backHome}
             </button>
           </div>
 
           {!order ? (
-            <div className="bg-white rounded-2xl shadow-sm p-8">
-              <div className="text-gray-600">No recent order in this demo.</div>
+            <div className="bg-white rounded-3xl shadow-sm border p-8">
+              <div className="text-gray-600">No recent order.</div>
             </div>
           ) : (
             <div className="grid lg:grid-cols-2 gap-8">
-              <div className="bg-white rounded-2xl shadow-sm p-6">
-                <div className="text-2xl font-extrabold mb-2">{t.orderPlaced}</div>
-                <div className="text-gray-600 mb-4">{t.orderPlacedMsg}</div>
+              <div className="bg-white rounded-3xl shadow-sm border p-6">
+                <div className="text-lg font-black mb-2">{t.orderMsg}</div>
 
-                <div className="p-4 rounded-xl bg-emerald-50 border border-emerald-100">
-                  <div className="font-extrabold">{t.orderId}: {order.id}</div>
+                <div className="p-4 rounded-2xl bg-emerald-50 border border-emerald-100">
+                  <div className="font-black">Order ID: {order.id}</div>
                   <div className="text-sm text-gray-600 mt-1">
-                    Total: <span className="font-bold">{formatBDT(order.total)}</span>
+                    Total: <span className="font-black">{formatBDT(order.total)}</span>
                   </div>
                 </div>
 
                 <div className="mt-4 flex gap-2 flex-wrap">
                   <button
-                    className="px-4 py-2 rounded-xl bg-gray-900 text-white font-extrabold"
+                    className="px-4 py-2 rounded-2xl bg-gray-900 text-white font-black"
                     onClick={async () => {
                       await copyText(order.message);
                       setCopied(true);
@@ -1042,30 +900,107 @@
                     {copied ? t.copied : t.copyOrder}
                   </button>
 
-                  <a href={MESSENGER_LINK} target="_blank" className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold">
+                  <a href={BRAND.messengerLink} target="_blank" className="px-4 py-2 rounded-2xl bg-emerald-700 hover:bg-emerald-800 text-white font-black">
                     {t.openMessenger}
                   </a>
                 </div>
 
-                <textarea className="mt-4 w-full border rounded-xl p-3 text-sm h-48" readOnly value={order.message}></textarea>
+                <textarea className="mt-4 w-full border rounded-2xl p-3 text-sm h-56" readOnly value={order.message}></textarea>
               </div>
 
-              <div className="bg-white rounded-2xl shadow-sm p-6">
-                <h2 className="text-xl font-extrabold mb-4">Cart Details</h2>
+              <div className="bg-white rounded-3xl shadow-sm border p-6">
+                <div className="text-xl font-black mb-4">Cart Details</div>
                 <div className="space-y-3 text-sm">
                   {order.items.map(i => (
-                    <div key={i.id} className="flex justify-between gap-3 border-b pb-2">
+                    <div key={i.id} className="flex justify-between gap-3 border-b pb-3">
                       <div className="flex-1">
-                        <div className="font-bold">{i.name_en} / {i.name_bn}</div>
+                        <div className="font-black">{i.name_en || ""} / {i.name_bn || ""}</div>
                         <div className="text-gray-500">ID: {i.id} • Qty: {i.quantity}</div>
                       </div>
-                      <div className="font-extrabold">{formatBDT(i.price * i.quantity)}</div>
+                      <div className="font-black">{formatBDT(i.price * i.quantity)}</div>
                     </div>
                   ))}
                 </div>
               </div>
             </div>
           )}
+        </div>
+      );
+
+      const Footer = () => (
+        <footer className="bg-gray-950 text-white mt-16">
+          <div className="container mx-auto px-4 py-12">
+            <div className="grid md:grid-cols-4 gap-8">
+              <div>
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-11 h-11 rounded-2xl overflow-hidden bg-white border flex items-center justify-center">
+                    <img src={BRAND.logo} alt={BRAND.name} className="w-full h-full object-contain" />
+                  </div>
+                  <div className="font-black text-lg">{BRAND.name}</div>
+                </div>
+                <div className="text-gray-300 text-sm leading-relaxed">
+                  Mixed online marketplace for Bangladesh. Checkout via Messenger — fast and simple.
+                </div>
+
+                <a href={BRAND.messengerLink} target="_blank"
+                   className="inline-flex mt-4 bg-emerald-700 hover:bg-emerald-600 px-4 py-2 rounded-2xl font-black">
+                  m.me/{BRAND.pageId}
+                </a>
+              </div>
+
+              <div>
+                <div className="font-black text-lg mb-4">{t.quickLinks}</div>
+                <ul className="space-y-2 text-sm text-gray-300">
+                  <li className="hover:text-white cursor-pointer">{t.about}</li>
+                  <li className="hover:text-white cursor-pointer">{t.contact}</li>
+                  <li className="hover:text-white cursor-pointer">{t.faq}</li>
+                </ul>
+              </div>
+
+              <div>
+                <div className="font-black text-lg mb-4">{t.policies}</div>
+                <ul className="space-y-2 text-sm text-gray-300">
+                  <li className="hover:text-white cursor-pointer">{t.returnRefund}</li>
+                  <li className="hover:text-white cursor-pointer">{t.privacy}</li>
+                  <li className="hover:text-white cursor-pointer">{t.terms}</li>
+                </ul>
+              </div>
+
+              <div>
+                <div className="font-black text-lg mb-4">{t.support}</div>
+                <ul className="space-y-2 text-sm text-gray-300">
+                  <li>📞 {BRAND.phone}</li>
+                  <li>📧 {BRAND.email}</li>
+                  <li>📍 {BRAND.address}</li>
+                </ul>
+              </div>
+            </div>
+
+            <div className="border-t border-white/10 mt-10 pt-6 text-center text-sm text-gray-400">
+              © 2025 Shohoz Bazar. All rights reserved.
+            </div>
+          </div>
+        </footer>
+      );
+
+      const MobileBottomNav = () => (
+        <div className="fixed bottom-0 left-0 right-0 bg-white border-t shadow-lg md:hidden z-50">
+          <div className="grid grid-cols-3 gap-1 p-2">
+            <button onClick={() => setPage("home")} className="flex flex-col items-center gap-1 py-2">
+              <span className="text-xl">🏠</span><span className="text-xs font-bold">{t.home}</span>
+            </button>
+            <button onClick={() => setPage("shop")} className="flex flex-col items-center gap-1 py-2">
+              <span className="text-xl">🛍️</span><span className="text-xs font-bold">{t.shop}</span>
+            </button>
+            <button onClick={() => setPage("cart")} className="flex flex-col items-center gap-1 py-2 relative">
+              <span className="text-xl">🛒</span><span className="text-xs font-bold">{t.cart}</span>
+              {cartCount > 0 && (
+                <span className="absolute top-1 right-6 bg-emerald-700 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center">
+                  {cartCount}
+                </span>
+              )}
+            </button>
+          </div>
         </div>
       );
 
@@ -1093,6 +1028,19 @@
 
     const root = ReactDOM.createRoot(document.getElementById("root"));
     root.render(<ShohozBazarApp />);
+  </script>
+
+  <!-- Redirect after Netlify Identity login -->
+  <script>
+    if (window.netlifyIdentity) {
+      window.netlifyIdentity.on("init", user => {
+        if (!user) {
+          window.netlifyIdentity.on("login", () => {
+            document.location.href = "/admin/";
+          });
+        }
+      });
+    }
   </script>
 </body>
 </html>
